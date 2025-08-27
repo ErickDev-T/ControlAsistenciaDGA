@@ -22,7 +22,7 @@ export default function ConfirmDialog({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // Enfocar botón al abrir
+  // enfocar botón al abrir
   useEffect(() => {
     if (open) firstBtnRef.current?.focus();
   }, [open]);
