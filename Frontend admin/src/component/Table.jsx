@@ -4,6 +4,8 @@ import { useApplications } from "../hooks/useApplications";
 import { FileText, Check, X } from "lucide-react";
 import ConfirmDialog from "./ConfirmDialog";
 import Swal from "sweetalert2";
+import { handleViewDoc } from "../utils/alertDoc";
+
 
 const isImageUrl = (url) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(url || "");
 const isPdfUrl   = (url) => /\.pdf$/i.test(url || "");
@@ -12,7 +14,7 @@ const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : "");
 export default function Table() {
   const { data, loading, error } = useApplications();
 
-  // Estado del diálogo
+  // estado del diálogo
   const [dialog, setDialog] = useState({
     open: false,
     action: null, // "accept" | "reject"
@@ -33,7 +35,7 @@ const handleViewDoc = (r) => {
     return;
   }
 
-  // Detectar tipo por MIME o por extensión
+  // detectar tipo por MIME o por extensión
   const isImg = type.startsWith("image/") || isImageUrl(url);
   const isPdf = type === "application/pdf" || isPdfUrl(url);
 
@@ -81,7 +83,7 @@ const handleViewDoc = (r) => {
     try {
       // await fetch(`/api/Applications/${row.codigo}/${action}`, { method: "POST" });
       console.log(`Acción '${action}' aplicada a código ${row.codigo}`);
-      // Muestra feedback rápido
+      // muestra feedback rápido
       alert(
         `${action === "accept" ? "Aceptado" : "Rechazado"}: ${row.nombreApellido} (#${row.codigo})`
       );
