@@ -1,14 +1,20 @@
+import logo from '../assets/dgaLogo.svg';
+
+
 // src/component/Header.jsx
 export default function Header() {
   return (
     <header className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
         {/* Logo + nombre */}
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-white/20 flex items-center justify-center text-white font-bold">
-            M
+          <div className="h-10 w-25 rounded-lg ">
+            <h1 className="text-4xl font-bold">
+              <img src={logo}/>
+            </h1>
+
           </div>
-          <span className="text-white font-semibold text-lg">Mi Sitio</span>
+          <span className="text-white font-semibold text-lg">Portal Asistencia</span>
         </div>
 
         {/* Links (pegados a la izquierda en pantallas grandes) */}
@@ -17,7 +23,7 @@ export default function Header() {
           <a href="#inicio" className="text-white hover:text-slate-100 transition">para </a>
           <a href="#inicio" className="text-white hover:text-slate-100 transition">el nav </a>
 
-          
+
         </nav>
 
         {/* Botón */}
@@ -25,7 +31,7 @@ export default function Header() {
           href="#"
           className="hidden sm:inline-block bg-white text-blue-600 font-medium px-4 py-2 rounded-lg shadow hover:bg-slate-100 transition"
         >
-          Empezar
+          Refrescar
         </a>
       </div>
     </header>
