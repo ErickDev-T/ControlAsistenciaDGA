@@ -18,4 +18,6 @@ public class Solicitud
 
   public DateTime? FechaSalida { get; set; }
   public TimeSpan? HoraSalida { get; set; }
+  public string? UrlDocumento { get; set; }
+  public string? DocumentoTipo { get; set; }
 }

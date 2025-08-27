@@ -17,7 +17,7 @@ public partial class TestDgadbContext : DbContext
     {
     }
 
-  public virtual DbSet<Solicitud> Solicitudes { get; set; }
+  public DbSet<Solicitud> Solicitudes { get; set; } = null!; // 👈
 
 
 
@@ -50,6 +50,16 @@ public partial class TestDgadbContext : DbContext
       entity.Property(e => e.HoraSalida)
             .HasColumnType("time(7)")
             .HasColumnName("HoraSalida");
+
+      entity.Property(e => e.UrlDocumento)
+            .HasMaxLength(1000)
+            .IsUnicode(false)
+            .HasColumnName("UrlDocumento");   
+        
+      entity.Property(e => e.DocumentoTipo)
+            .HasMaxLength(100)
+            .IsUnicode(false)
+            .HasColumnName("DocumentoTipo");
     });
 
     base.OnModelCreating(modelBuilder);
