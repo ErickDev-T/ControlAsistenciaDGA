@@ -1,5 +1,5 @@
 {
-  "name": "asistenciadga",
+  "name": "my-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,12 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.12",
-    "lucide-react": "^0.542.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "sweetalert2": "^11.22.5",
-    "tailwindcss": "^4.1.12"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
