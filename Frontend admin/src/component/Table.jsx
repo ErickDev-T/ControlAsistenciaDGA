@@ -6,8 +6,8 @@ import Swal from "sweetalert2";
 import { Search, FileText, Check, X } from "lucide-react";
 
 const isImageUrl = (url) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(url || "");
-const isPdfUrl   = (url) => /\.pdf$/i.test(url || "");
-const fmtDate    = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : "");
+const isPdfUrl = (url) => /\.pdf$/i.test(url || "");
+const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : "");
 
 const norm = (v) =>
   (v ?? "")
@@ -18,6 +18,7 @@ const norm = (v) =>
 
 export default function Table() {
   const { data, loading, error } = useApplications();
+
 
   // hooks dentro del componente
   const [query, setQuery] = useState("");
@@ -53,7 +54,7 @@ export default function Table() {
 
     const isImg = type.startsWith("image/") || isImageUrl(url);
     const isPdf = type === "application/pdf" || isPdfUrl(url);
-
+    //si es una img
     const htmlImg = `
       <a href="${url}" target="_blank" rel="noopener">
         <img src="${url}" alt="Documento de ${r.nombreApellido}"
@@ -61,20 +62,20 @@ export default function Table() {
       </a>
       <p style="margin-top:10px; color:#475569;">Código: ${r.codigo}</p>
     `;
-
+    //si es un pdf
     const htmlPdf = `
       <div style="width:100%; max-width:900px;">
         <iframe src="${url}" style="width:100%; height:75vh; border:0; border-radius:8px; box-shadow: 0 6px 24px rgba(0,0,0,.15);" title="PDF"></iframe>
         <p style="margin-top:10px; color:#475569;">Código: ${r.codigo}</p>
       </div>
     `;
-
+    // ninguno de los anteriores
     const htmlFallback = `
       <p style="margin:0 0 6px;">No se puede previsualizar este tipo de archivo.</p>
       <a href="${url}" target="_blank" rel="noopener" style="text-decoration:underline;">Abrir en pestaña</a>
       <p style="margin-top:10px; color:#475569;">Código: ${r.codigo}</p>
     `;
-
+    //propiedadesalerta de sweeralert
     Swal.fire({
       title: `Documento de ${r.nombreApellido}`,
       html: isImg ? htmlImg : isPdf ? htmlPdf : htmlFallback,
@@ -125,15 +126,16 @@ export default function Table() {
     dialog.action === "accept"
       ? { title: "¿Aceptar solicitud?", desc: "Confirmas que esta solicitud será aprobada." }
       : dialog.action === "reject"
-      ? { title: "¿Rechazar solicitud?", desc: "Esta acción es irreversible." }
-      : { title: "", desc: "" };
+        ? { title: "¿Rechazar solicitud?", desc: "Esta acción es irreversible." }
+        : { title: "", desc: "" };
 
-  const tone         = dialog.action === "accept" ? "success" : "destructive";
+  const tone = dialog.action === "accept" ? "success" : "destructive";
   const confirmLabel = dialog.action === "accept" ? "Aceptar" : "Rechazar";
+  const pendientes = filtered.length;
 
   return (
     <div className="overflow-x-auto p-6">
-      {/* ✅ Barra de búsqueda dentro del return */}
+      {/* barra de busqueda + contador */}
       <div className="mb-4 flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -144,6 +146,7 @@ export default function Table() {
             className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
           />
         </div>
+
         {query && (
           <button
             onClick={() => setQuery("")}
@@ -152,6 +155,11 @@ export default function Table() {
             Limpiar
           </button>
         )}
+
+        {/* contador 👇 ahora dentro del flex */}
+        <span className="px-4 py-2 bg-blue-100 text-blue-500 rounded-lg shadow text-sm font-medium whitespace-nowrap">
+          Pendientes: {filtered.length}
+        </span>
       </div>
 
       <table className="min-w-full border border-slate-200 rounded-lg overflow-hidden shadow bg-white">
@@ -204,7 +212,7 @@ export default function Table() {
             </tr>
           ))}
 
-          {/* ✅ usa filtered.length para el estado vacío */}
+          {/*  filtered.length para el cuando esta vacío */}
           {filtered.length === 0 && (
             <tr>
               <td className="px-4 py-6 text-center text-slate-500" colSpan={7}>
