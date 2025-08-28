@@ -15,23 +15,23 @@ public class UploadsController : ControllerBase
     _db = db;
   }
 
-  // POST /api/uploads/123  (form-data: file=<archivo>)
+  // POST /api/uploads/123 
   [HttpPost("{codigo:int}")]
   public async Task<IActionResult> Upload(int codigo, IFormFile file)
   {
     if (file == null || file.Length == 0)
       return BadRequest("Archivo vacío.");
 
-    // 1) Buscar la solicitud
+    //  buscar la solicitud
     var solicitud = await _db.Solicitudes.FindAsync(codigo);
     if (solicitud == null)
       return NotFound($"No existe la solicitud con código {codigo}.");
 
-    // 2) Asegurar carpeta
+    // asegurar carpeta
     var uploadsPath = Path.Combine(_env.WebRootPath, "uploads");
     Directory.CreateDirectory(uploadsPath);
 
-    // 3) Guardar archivo físicamente
+    // guardar archivo físicamente
     var safeName = Path.GetFileName(file.FileName);
     var fileName = $"{Guid.NewGuid()}_{safeName}";
     var filePath = Path.Combine(uploadsPath, fileName);
@@ -39,10 +39,10 @@ public class UploadsController : ControllerBase
     await using (var stream = new FileStream(filePath, FileMode.Create))
       await file.CopyToAsync(stream);
 
-    // 4) Armar URL pública
+    // armar URL pública
     var fileUrl = $"{Request.Scheme}://{Request.Host}/uploads/{fileName}";
 
-    // 5) Guardar URL y tipo en la BD
+    // guardar URL y tipo en la BD
     solicitud.UrlDocumento = fileUrl;
     solicitud.DocumentoTipo = file.ContentType; // ej: image/png, application/pdf
     await _db.SaveChangesAsync();
