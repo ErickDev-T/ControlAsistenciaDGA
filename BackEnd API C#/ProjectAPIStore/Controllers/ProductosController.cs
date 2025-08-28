@@ -24,8 +24,23 @@ namespace ProjectAPIStore.Controllers
       return Ok(solicitudes);
     }
 
-    // GET api/solicitudes/5
-    [HttpGet("{id:int}")]
+    // DELETE api/solicitudes/5
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteSolicitud(int id)
+    {
+        var solicitud = await _context.Solicitudes.FindAsync(id);
+        if (solicitud == null)
+            return NotFound();
+
+        _context.Solicitudes.Remove(solicitud);
+        await _context.SaveChangesAsync();
+
+        return NoContent(); // 204
+    }
+
+
+        // GET api/solicitudes/5
+        [HttpGet("{id:int}")]
     public async Task<ActionResult<Solicitud>> GetSolicitud(int id)
     {
       var solicitud = await _context.Solicitudes.FindAsync(id);
