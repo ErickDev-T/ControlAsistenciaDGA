@@ -8,14 +8,10 @@ namespace ProjectAPIStore.Models;
 [Table("Solicitudes")]
 public class Solicitud
 {
-  [Key] public int Codigo { get; set; }
-
-  [Required, StringLength(150)]
-  public string NombreApellido { get; set; } = string.Empty;
-
-  [Required] public TimeSpan HoraEntrada { get; set; }
-  [Required] public DateTime FechaEntrada { get; set; }
-
+  public int Codigo { get; set; }
+  public string NombreApellido { get; set; } = "";
+  public TimeSpan HoraEntrada { get; set; }
+  public DateTime FechaEntrada { get; set; }
   public DateTime? FechaSalida { get; set; }
   public TimeSpan? HoraSalida { get; set; }
   public string? UrlDocumento { get; set; }
