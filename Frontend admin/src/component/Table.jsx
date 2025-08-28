@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useApplications } from "../hooks/useApplications";
 import ConfirmDialog from "./ConfirmDialog";
 import Swal from "sweetalert2";
+import { handleViewDoc } from "../utils/alertDoc";
 import { Search, FileText, Check, X } from "lucide-react";
 
 const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : "");
@@ -10,8 +11,9 @@ const norm = (v) =>
   (v ?? "").toString().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
 
 // selectedDate en formato YYYY-MM-DD
-export default function Table({ selectedDate = "" }) {
-  const { data, loading, error, remove } = useApplications();
+export default function Table({ selectedDate = "", controller }) {
+  const local = useApplications();
+  const { data, loading, error, remove } = controller ?? local;
 
   const [query, setQuery] = useState("");
   const [dialog, setDialog] = useState({ open: false, action: null, row: null });
@@ -105,14 +107,12 @@ export default function Table({ selectedDate = "" }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por código o nombre..."
-            className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
-          />
+            className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"/>
         </div>
         {query && (
           <button
             onClick={() => setQuery("")}
-            className="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700"
-          >
+            className="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700">
             Limpiar
           </button>
         )}
@@ -121,7 +121,7 @@ export default function Table({ selectedDate = "" }) {
         </span>
       </div>
 
-      {/* Tabla */}
+      {/* tabla */}
       <div className="overflow-hidden rounded-xl border border-slate-200 shadow">
         <div className="overflow-x-auto">
           <table className="min-w-full">
@@ -148,8 +148,7 @@ export default function Table({ selectedDate = "" }) {
                 return (
                   <tr
                     key={codigo}
-                    className={`transition-colors ${i % 2 ? "bg-slate-50/50" : "bg-white"} hover:bg-slate-100`}
-                  >
+                    className={`transition-colors ${i % 2 ? "bg-slate-50/50" : "bg-white"} hover:bg-slate-100`}>
                     <td className="px-4 py-3">{codigo}</td>
                     <td className="px-4 py-3">{nombre}</td>
                     <td className="px-4 py-3">{fmtDate(fechaEntrada)}</td>
@@ -161,22 +160,19 @@ export default function Table({ selectedDate = "" }) {
                         <button
                           className="inline-flex items-center justify-center h-8 w-8 rounded-md text-indigo-600 bg-indigo-50 hover:bg-indigo-100 ring-1 ring-inset ring-indigo-200"
                           title="Ver documento"
-                          onClick={() =>  null}
-                        >
+                          onClick={() => handleViewDoc(r)}>
                           <FileText size={18} />
                         </button>
                         <button
                           className="inline-flex items-center justify-center h-8 w-8 rounded-md text-emerald-600 bg-emerald-50 hover:bg-emerald-100 ring-1 ring-inset ring-emerald-200"
                           title="Aceptar"
-                          onClick={() => openConfirm("accept", r)}
-                        >
+                          onClick={() => openConfirm("accept", r)}>
                           <Check size={18} />
                         </button>
                         <button
                           className="inline-flex items-center justify-center h-8 w-8 rounded-md text-rose-600 bg-rose-50 hover:bg-rose-100 ring-1 ring-inset ring-rose-200"
                           title="Rechazar"
-                          onClick={() => openConfirm("reject", r)}
-                        >
+                          onClick={() => openConfirm("reject", r)}>
                           <X size={18} />
                         </button>
                       </div>
