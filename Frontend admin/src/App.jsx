@@ -1,3 +1,4 @@
+import Footer from "./component/Footer.jsx";
 import Header from "./component/Header.jsx";
 import Table from "./component/Table.jsx";
 
@@ -6,6 +7,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-100">
       <Header />
       <Table />
+      <Footer/>
     </div>
   );
 }

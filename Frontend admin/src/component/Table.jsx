@@ -162,68 +162,79 @@ export default function Table() {
         </span>
       </div>
 
-      <table className="min-w-full border border-slate-200 rounded-lg overflow-hidden shadow bg-white">
-        <thead className="bg-blue-400 text-white">
-          <tr>
-            <th className="px-4 py-3 text-left text-sm font-semibold">Código</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">Nombre</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">Fecha Entrada</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">Hora Entrada</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">Fecha Salida</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">Hora Salida</th>
-            <th className="px-4 py-3 text-left text-sm font-semibold">Acciones</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-200">
-          {filtered.map((r) => (
-            <tr key={r.codigo} className="hover:bg-slate-50">
-              <td className="px-4 py-3">{r.codigo}</td>
-              <td className="px-4 py-3">{r.nombreApellido}</td>
-              <td className="px-4 py-3">{fmtDate(r.fechaEntrada)}</td>
-              <td className="px-4 py-3">{r.horaEntrada}</td>
-              <td className="px-4 py-3">{fmtDate(r.fechaSalida)}</td>
-              <td className="px-4 py-3">{r.horaSalida}</td>
+      <div className="overflow-hidden rounded-xl border border-slate-200 shadow">
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white">
+            <thead className="bg-gradient-to-r from-blue-500 to-blue-400 text-white sticky top-0 z-10">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Código</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Nombre</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Fecha Entrada</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Hora Entrada</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Fecha Salida</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Hora Salida</th>
+                <th className="px-4 py-3 text-left text-sm font-semibold">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {filtered.map((r, i) => (
+                <tr
+                  key={r.codigo}
+                  className={`transition-colors ${i % 2 ? "bg-slate-50/50" : "bg-white"
+                    } hover:bg-slate-100`}
+                >
+                  <td className="px-4 py-3">{r.codigo}</td>
+                  <td className="px-4 py-3">{r.nombreApellido}</td>
+                  <td className="px-4 py-3">{fmtDate(r.fechaEntrada)}</td>
+                  <td className="px-4 py-3">{r.horaEntrada}</td>
+                  <td className="px-4 py-3">{fmtDate(r.fechaSalida)}</td>
+                  <td className="px-4 py-3">{r.horaSalida}</td>
 
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <button
-                    className="text-indigo-500 hover:text-indigo-700"
-                    title="Ver documento"
-                    onClick={() => handleViewDoc(r)}
-                  >
-                    <FileText size={20} />
-                  </button>
-                  <button
-                    className="text-green-600 hover:text-green-700"
-                    title="Aceptar"
-                    onClick={() => openConfirm("accept", r)}
-                  >
-                    <Check size={20} />
-                  </button>
-                  <button
-                    className="text-red-600 hover:text-red-700"
-                    title="Rechazar"
-                    onClick={() => openConfirm("reject", r)}
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="inline-flex items-center justify-center h-8 w-8 rounded-md text-indigo-600 bg-indigo-50 hover:bg-indigo-100 ring-1 ring-inset ring-indigo-200"
+                        title="Ver documento"
+                        onClick={() => handleViewDoc(r)}
+                      >
+                        <FileText size={18} />
+                      </button>
+                      <button
+                        className="inline-flex items-center justify-center h-8 w-8 rounded-md text-emerald-600 bg-emerald-50 hover:bg-emerald-100 ring-1 ring-inset ring-emerald-200"
+                        title="Aceptar"
+                        onClick={() => openConfirm("accept", r)}
+                      >
+                        <Check size={18} />
+                      </button>
+                      <button
+                        className="inline-flex items-center justify-center h-8 w-8 rounded-md text-rose-600 bg-rose-50 hover:bg-rose-100 ring-1 ring-inset ring-rose-200"
+                        title="Rechazar"
+                        onClick={() => openConfirm("reject", r)}
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
 
-          {/*  filtered.length para el cuando esta vacío */}
-          {filtered.length === 0 && (
-            <tr>
-              <td className="px-4 py-6 text-center text-slate-500" colSpan={7}>
-                {query ? "Sin resultados para tu búsqueda." : "Sin datos para mostrar."}
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+              {/* estado vacío */}
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={7} className="px-4 py-10 text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-50 text-slate-600 ring-1 ring-slate-200">
+                      😕 {query ? "Sin resultados para tu búsqueda." : "Sin datos para mostrar."}
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      {/* Diálogo de confirmación */}
+
+      {/* dialogo de confirmacion */}
       <ConfirmDialog
         open={dialog.open}
         onClose={() => setDialog((d) => ({ ...d, open: false }))}

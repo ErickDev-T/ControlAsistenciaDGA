@@ -26,13 +26,7 @@ export default function Header() {
 
         </nav>
 
-        {/* Botón */}
-        <a
-          href="#"
-          className="hidden sm:inline-block bg-white text-blue-600 font-medium px-4 py-2 rounded-lg shadow hover:bg-slate-100 transition"
-        >
-          Refrescar
-        </a>
+      
       </div>
     </header>
   );
