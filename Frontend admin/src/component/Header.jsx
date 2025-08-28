@@ -27,7 +27,7 @@ export default function Header({ onDateChange }) {
               type="date"
               className="bg-transparent outline-none text-white placeholder-white/60 [color-scheme:dark]"
               onChange={(e) => onDateChange?.(e.target.value)}
-              aria-label="Filtrar por fecha"
+              aria-label="Filtrar por fecha."
             />
           </label>
         </div>
