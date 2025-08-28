@@ -1,8 +1,8 @@
+// src/component/Table.jsx
 import { useState, useMemo } from "react";
 import { useApplications } from "../hooks/useApplications";
 import ConfirmDialog from "./ConfirmDialog";
 import Swal from "sweetalert2";
-// import { handleViewDoc } from "../utils/alertDoc";
 import { Search, FileText, Check, X } from "lucide-react";
 
 const isImageUrl = (url) => /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(url || "");
@@ -16,27 +16,42 @@ const norm = (v) =>
     .normalize("NFD")
     .replace(/\p{Diacritic}/gu, "");
 
-export default function Table() {
+// 🔹 Recibe selectedDate como prop (formato YYYY-MM-DD)
+export default function Table({ selectedDate = "" }) {
   const { data, loading, error } = useApplications();
-
-
-  // hooks dentro del componente
   const [query, setQuery] = useState("");
-  const [dialog, setDialog] = useState({
-    open: false,
-    action: null, // accept | reject
-    row: null,
-  });
+  const [dialog, setDialog] = useState({ open: false, action: null, row: null });
 
+  // 🔹 Filtro combinado: texto + fecha
   const filtered = useMemo(() => {
+    let rows = data || [];
+
+    // 1) Filtro por texto (código o nombre)
     const q = norm(query.trim());
-    if (!q) return data || [];
-    return (data || []).filter((r) => {
-      const byCodigo = String(r.codigo).includes(query.trim());
-      const byNombre = norm(r.nombreApellido).includes(q);
-      return byCodigo || byNombre;
-    });
-  }, [data, query]);
+    if (q) {
+      rows = rows.filter((r) => {
+        const byCodigo = String(r.codigo ?? "").includes(query.trim());
+        const byNombre = norm(r.nombreApellido ?? "").includes(q);
+        return byCodigo || byNombre;
+      });
+    }
+
+    // 2) Filtro por fecha de entrada (YYYY-MM-DD)
+    if (selectedDate) {
+      rows = rows.filter((r) => {
+        const raw = r.fechaEntrada ?? r.FechaEntrada ?? r.fecha_entrada;
+        if (!raw) return false;
+        const d = new Date(raw);
+        const key =
+          `${d.getFullYear()}-` +
+          `${String(d.getMonth() + 1).padStart(2, "0")}-` +
+          `${String(d.getDate()).padStart(2, "0")}`;
+        return key === selectedDate;
+      });
+    }
+
+    return rows;
+  }, [data, query, selectedDate]);
 
   const handleViewDoc = (r) => {
     const url = r.urlDocumento;
@@ -54,7 +69,7 @@ export default function Table() {
 
     const isImg = type.startsWith("image/") || isImageUrl(url);
     const isPdf = type === "application/pdf" || isPdfUrl(url);
-    //si es una img
+
     const htmlImg = `
       <a href="${url}" target="_blank" rel="noopener">
         <img src="${url}" alt="Documento de ${r.nombreApellido}"
@@ -62,20 +77,20 @@ export default function Table() {
       </a>
       <p style="margin-top:10px; color:#475569;">Código: ${r.codigo}</p>
     `;
-    //si es un pdf
+
     const htmlPdf = `
       <div style="width:100%; max-width:900px;">
         <iframe src="${url}" style="width:100%; height:75vh; border:0; border-radius:8px; box-shadow: 0 6px 24px rgba(0,0,0,.15);" title="PDF"></iframe>
         <p style="margin-top:10px; color:#475569;">Código: ${r.codigo}</p>
       </div>
     `;
-    // ninguno de los anteriores
+
     const htmlFallback = `
       <p style="margin:0 0 6px;">No se puede previsualizar este tipo de archivo.</p>
       <a href="${url}" target="_blank" rel="noopener" style="text-decoration:underline;">Abrir en pestaña</a>
       <p style="margin-top:10px; color:#475569;">Código: ${r.codigo}</p>
     `;
-    //propiedadesalerta de sweeralert
+
     Swal.fire({
       title: `Documento de ${r.nombreApellido}`,
       html: isImg ? htmlImg : isPdf ? htmlPdf : htmlFallback,
@@ -89,14 +104,11 @@ export default function Table() {
     });
   };
 
-  const openConfirm = (action, row) => {
-    setDialog({ open: true, action, row });
-  };
+  const openConfirm = (action, row) => setDialog({ open: true, action, row });
 
   const doConfirm = async () => {
     const { action, row } = dialog;
     try {
-      // await fetch(`/api/Applications/${row.codigo}/${action}`, { method: "POST" });
       console.log(`Acción '${action}' aplicada a código ${row.codigo}`);
       Swal.fire({
         icon: action === "accept" ? "success" : "info",
@@ -105,37 +117,29 @@ export default function Table() {
         timer: 1800,
         showConfirmButton: false,
       });
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Ocurrió un error al procesar la acción",
-      });
+    } catch {
+      Swal.fire({ icon: "error", title: "Error", text: "Ocurrió un error al procesar la acción" });
     } finally {
-      // cierra el diálogo pase lo que pase
       setDialog({ open: false, action: null, row: null });
     }
   };
-  //si los doc estan cargando
-  if (loading) return <div className="p-6">Cargando...</div>;
-  //si no carga la tabla
-  //if (error)   return <div className="p-6 text-red-600">Error: {error}</div>;
 
-  // textos seguros cuando no hay acción seleccionada
+  if (loading) return <div className="p-6">Cargando...</div>;
+  // if (error) return <div className="p-6 text-red-600">Error: {error}</div>;
+
   const dialogText =
     dialog.action === "accept"
       ? { title: "¿Aceptar solicitud?", desc: "Confirmas que esta solicitud será aprobada." }
       : dialog.action === "reject"
-        ? { title: "¿Rechazar solicitud?", desc: "Esta acción es irreversible." }
-        : { title: "", desc: "" };
+      ? { title: "¿Rechazar solicitud?", desc: "Esta acción es irreversible." }
+      : { title: "", desc: "" };
 
   const tone = dialog.action === "accept" ? "success" : "destructive";
   const confirmLabel = dialog.action === "accept" ? "Aceptar" : "Rechazar";
-  const pendientes = filtered.length;
 
   return (
     <div className="overflow-x-auto p-6">
-      {/* barra de busqueda + contador */}
+      {/* barra de búsqueda + contador */}
       <div className="mb-4 flex items-center gap-3">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -156,7 +160,6 @@ export default function Table() {
           </button>
         )}
 
-        {/* contador */}
         <span className="px-4 py-2 bg-blue-100 text-blue-900 rounded-lg shadow text-sm font-medium whitespace-nowrap">
           Pendientes: {filtered.length}
         </span>
@@ -180,8 +183,7 @@ export default function Table() {
               {filtered.map((r, i) => (
                 <tr
                   key={r.codigo}
-                  className={`transition-colors ${i % 2 ? "bg-slate-50/50" : "bg-white"
-                    } hover:bg-slate-100`}
+                  className={`transition-colors ${i % 2 ? "bg-slate-50/50" : "bg-white"} hover:bg-slate-100`}
                 >
                   <td className="px-4 py-3">{r.codigo}</td>
                   <td className="px-4 py-3">{r.nombreApellido}</td>
@@ -189,7 +191,6 @@ export default function Table() {
                   <td className="px-4 py-3">{r.horaEntrada}</td>
                   <td className="px-4 py-3">{fmtDate(r.fechaSalida)}</td>
                   <td className="px-4 py-3">{r.horaSalida}</td>
-
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
                       <button
@@ -218,7 +219,6 @@ export default function Table() {
                 </tr>
               ))}
 
-              {/* estado vacío */}
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-10 text-center">
@@ -233,8 +233,6 @@ export default function Table() {
         </div>
       </div>
 
-
-      {/* dialogo de confirmacion */}
       <ConfirmDialog
         open={dialog.open}
         onClose={() => setDialog((d) => ({ ...d, open: false }))}

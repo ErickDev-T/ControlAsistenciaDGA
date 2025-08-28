@@ -1,31 +1,36 @@
-import logo from '../assets/dgaLogo.svg';
+// src/component/Header.jsx
+import { Calendar } from "lucide-react";
+import logo from "../assets/dgaLogo.svg";
 
-
-export default function Header() {
+export default function Header({ onDateChange }) {
   return (
     <header className="w-full bg-gradient-to-r from-slate-900 to-slate-900 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
-        {/* Logo + nombre */}
-        <div className="flex items-center gap-2">
-          <div className="h-10 w-25 rounded-lg ">
-            <h1 className="text-4xl font-bold">
-              <img src={logo}/>
-            </h1>
-
-          </div>
+      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+        {/* logo + nombre */}
+        <div className="flex items-center gap-3">
+          <img src={logo} alt="DGA" className="h-9 w-auto select-none" />
           <span className="text-white font-semibold text-lg">Portal Asistencia</span>
         </div>
 
-        {/* Links (pegados a la izquierda en pantallas grandes) */}
-        <nav className="hidden md:flex items-center gap-6 ml-10">
-          <a href="#inicio" className="text-white hover:text-slate-100 transition">algo</a>
-          <a href="#inicio" className="text-white hover:text-slate-100 transition">para </a>
-          <a href="#inicio" className="text-white hover:text-slate-100 transition">el nav </a>
+        {/* links centro/izquierda */}
+        
 
+        <div className="flex items-center gap-3">
+          <p className="hidden sm:inline-block text-sm px-2.5 py-1 rounded-md bg-blue-600/20 text-blue-200 border border-blue-400/30">
+            Filtro Entrada
+          </p>
 
-        </nav>
-
-      
+          {/* filtro por fecha */}
+          <label className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-md text-sm text-white/90 border border-white/10">
+            <Calendar size={16} aria-hidden="true" />
+            <input
+              type="date"
+              className="bg-transparent outline-none text-white placeholder-white/60 [color-scheme:dark]"
+              onChange={(e) => onDateChange?.(e.target.value)}
+              aria-label="Filtrar por fecha"
+            />
+          </label>
+        </div>
       </div>
     </header>
   );
