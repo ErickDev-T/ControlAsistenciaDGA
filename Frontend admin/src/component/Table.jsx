@@ -156,16 +156,16 @@ export default function Table() {
           </button>
         )}
 
-        {/* contador 👇 ahora dentro del flex */}
-        <span className="px-4 py-2 bg-blue-100 text-blue-500 rounded-lg shadow text-sm font-medium whitespace-nowrap">
+        {/* contador */}
+        <span className="px-4 py-2 bg-blue-100 text-blue-900 rounded-lg shadow text-sm font-medium whitespace-nowrap">
           Pendientes: {filtered.length}
         </span>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-slate-200 shadow">
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead className="bg-gradient-to-r from-blue-500 to-blue-400 text-white sticky top-0 z-10">
+          <table className="min-w-full">
+            <thead className="bg-gradient-to-r from-white text-blue sticky top-0 z-10">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Código</th>
                 <th className="px-4 py-3 text-left text-sm font-semibold">Nombre</th>

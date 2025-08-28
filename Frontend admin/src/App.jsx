@@ -4,10 +4,14 @@ import Table from "./component/Table.jsx";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen flex flex-col bg-slate-100">
       <Header />
-      <Table />
-      <Footer/>
+
+      <main className="flex-grow">
+        <Table />
+      </main>
+
+      <Footer />
     </div>
   );
 }

@@ -1,10 +1,9 @@
 import logo from '../assets/dgaLogo.svg';
 
 
-// src/component/Header.jsx
 export default function Header() {
   return (
-    <header className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 shadow-md">
+    <header className="w-full bg-gradient-to-r from-slate-900 to-slate-900 shadow-md">
       <div className="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
         {/* Logo + nombre */}
         <div className="flex items-center gap-2">
