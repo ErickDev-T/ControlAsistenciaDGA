@@ -9,12 +9,12 @@ export default function ConfirmDialog({
   description = "Esta acción no se puede deshacer.",
   confirmLabel = "Confirmar",
   cancelLabel = "Cancelar",
-  tone = "default", // "default" | "success" | "destructive"
+  tone = "default", 
 }) {
   const backdropRef = useRef(null);
   const firstBtnRef = useRef(null);
 
-  // Cerrar con ESC
+  // cerrar con ESC
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => e.key === "Escape" && onClose?.();
@@ -22,7 +22,7 @@ export default function ConfirmDialog({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  // Enfocar botón al abrir
+  // enfocar botón al abrir
   useEffect(() => {
     if (open) firstBtnRef.current?.focus();
   }, [open]);
@@ -41,14 +41,12 @@ export default function ConfirmDialog({
       ref={backdropRef}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onMouseDown={(e) => {
-        // cerrar al hacer click fuera (backdrop)
+        // cerrar al hacer click fuera 
         if (e.target === backdropRef.current) onClose?.();
       }}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-fade-in" />
 
-      {/* Modal */}
       <div className="relative w-full max-w-md rounded-2xl bg-white shadow-xl animate-scale-in">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
@@ -75,7 +73,7 @@ export default function ConfirmDialog({
         </div>
       </div>
 
-      {/* Animations (Tailwind keyframes vía utilidades) */}
+      {/* Animations */}
       <style>{`
         .animate-fade-in { animation: fade-in .12s ease-out forwards }
         .animate-scale-in { animation: scale-in .18s ease-out forwards; transform-origin: center; }
