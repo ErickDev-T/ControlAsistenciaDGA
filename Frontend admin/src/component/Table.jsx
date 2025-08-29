@@ -1,45 +1,62 @@
 // src/components/Table.jsx
 import { useMemo, useState } from "react";
-import { useApplications } from "../hooks/useApplications";
 import ConfirmDialog from "./ConfirmDialog";
 import Swal from "sweetalert2";
+import { handleViewDoc } from "../utils/alertDoc";
 import { Search, FileText, Check, X } from "lucide-react";
 
-const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : "");
-const norm = (v) =>
-  (v ?? "").toString().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : ""); //"2025-08-27T00:00:00"= "27/8/2025"
 
-// selectedDate en formato YYYY-MM-DD
-export default function Table({ selectedDate = "" }) {
-  const { data, loading, error, remove } = useApplications();
+const norm = (v) => // normalizar la fecha
+  (v ?? "")
+    .toString() // solo texto
+    .toLowerCase() //minuscula todo
+    .normalize("NFD") // si tiene tilde se la quita 
+    .replace(/[\u0300-\u036f]/g, ""); // signos no comunes
+    
+// genera una clave unica para cada fila de la tabla 
+// react pueda identificar y renderizar cada <tr> de forma estable.
+const getRowKey = (r, i) => {
+  const id = r.id ?? r.Id;
+  if (id !== undefined && id !== null) return `${id}-${i}`; //
+};
 
+// formato YYYY-MM-DD
+export default function Table({ selectedDate = "", controller }) {
+  
+  const { data = [], loading = false, error = "", remove = () => {} } = controller ?? {};
   const [query, setQuery] = useState("");
   const [dialog, setDialog] = useState({ open: false, action: null, row: null });
-
   const openConfirm = (action, row) => setDialog({ open: true, action, row });
   const closeConfirm = () => setDialog({ open: false, action: null, row: null });
-
   const filtered = useMemo(() => {
-    let rows = Array.isArray(data) ? data : [];
+
+    let rows = Array.isArray(data) ? data : [];    
 
     const q = norm(query.trim());
+    // busca en codigo, nombre y apellido que coincidan con los tokens
+
     if (q) {
-      rows = rows.filter((r) => {
-        const codigo = String(r.codigo ?? r.Codigo ?? "");
-        const nombre = norm(r.nombreApellido ?? r.NombreApellido ?? "");
-        return codigo.includes(query.trim()) || nombre.includes(q);
+      const tokens = q.split(/\s+/).filter(Boolean); //separa texto en palabras //.filter elimina espacios dobles
+      rows = rows.filter((r) => { //recorre todo y se queda con las filas que coincidan 
+        const codigoRaw = String(r.codigo ?? r.Codigo ?? "");
+        const nombreRaw = r.nombreApellido ?? r.NombreApellido ?? r.nombre ?? r.Nombre ?? "";
+        const apellidoRaw = r.apellido ?? r.Apellido ?? "";
+        const haystack = norm([codigoRaw, nombreRaw, apellidoRaw].join(" "));
+        return tokens.every((t) => haystack.includes(t));
       });
     }
-
+    //filtrar por fecha
     if (selectedDate) {
       rows = rows.filter((r) => {
         const raw = r.fechaEntrada ?? r.FechaEntrada ?? null;
-        if (!raw) return false;
-        const d = new Date(raw);
-        const key =
+        if (!raw) return false; // si no hay fecha, descartar la fil
+        const d = new Date(raw); // convertir a objeto Date
+        const key = //normaliza la fecha
           `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
             d.getDate()
-          ).padStart(2, "0")}`;
+          ).padStart(2, "0")}`;               //meses en  js son de el 0-11 por eso +1
+            // comparar con la fecha seleccionada
         return key === selectedDate;
       });
     }
@@ -54,13 +71,13 @@ export default function Table({ selectedDate = "" }) {
 
     try {
       if (action === "reject") {
-        const id = row.codigo ?? row.Codigo;
-        await remove(id); // llama al hook para borrar y actualizar estado
+        const id = row.id ?? row.Id; 
+        await remove(id);
 
         Swal.fire({
           icon: "success",
           title: "Solicitud eliminada",
-          text: `${row.nombreApellido ?? row.NombreApellido ?? ""} (#${id})`,
+          text: `${row.nombreApellido ?? row.NombreApellido ?? ""} (Id #${id})`,
           timer: 1400,
           showConfirmButton: false,
         });
@@ -84,7 +101,7 @@ export default function Table({ selectedDate = "" }) {
 
   if (loading) return <div className="p-6">Cargando...</div>;
   if (error)   return <div className="p-6 text-red-600">Error: {String(error)}</div>;
-
+  //pop up para botones aceptar o rechazar  
   const dialogText =
     dialog.action === "accept"
       ? { title: "¿Aceptar solicitud?", desc: "Confirmas que esta solicitud será aprobada." }
@@ -105,14 +122,12 @@ export default function Table({ selectedDate = "" }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar por código o nombre..."
-            className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"
-          />
+            className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-blue-400"/>
         </div>
         {query && (
           <button
             onClick={() => setQuery("")}
-            className="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700"
-          >
+            className="px-3 py-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700">
             Limpiar
           </button>
         )}
@@ -121,9 +136,9 @@ export default function Table({ selectedDate = "" }) {
         </span>
       </div>
 
-      {/* Tabla */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 shadow">
-        <div className="overflow-x-auto">
+      {/* tabla */}
+      <div className="rounded-xl border border-slate-200 shadow max-h-[70vh] overflow-auto">
+        <div className="min-w-full">
           <table className="min-w-full">
             <thead className="bg-gradient-to-r from-white text-blue sticky top-0 z-10">
               <tr>
@@ -147,9 +162,8 @@ export default function Table({ selectedDate = "" }) {
 
                 return (
                   <tr
-                    key={codigo}
-                    className={`transition-colors ${i % 2 ? "bg-slate-50/50" : "bg-white"} hover:bg-slate-100`}
-                  >
+                    key={getRowKey(r, i)}
+                    className={`transition-colors ${i % 2 ? "bg-slate-50/50" : "bg-white"} hover:bg-slate-100`}>
                     <td className="px-4 py-3">{codigo}</td>
                     <td className="px-4 py-3">{nombre}</td>
                     <td className="px-4 py-3">{fmtDate(fechaEntrada)}</td>
@@ -161,22 +175,19 @@ export default function Table({ selectedDate = "" }) {
                         <button
                           className="inline-flex items-center justify-center h-8 w-8 rounded-md text-indigo-600 bg-indigo-50 hover:bg-indigo-100 ring-1 ring-inset ring-indigo-200"
                           title="Ver documento"
-                          onClick={() =>  null}
-                        >
+                          onClick={() => handleViewDoc(r)}>
                           <FileText size={18} />
                         </button>
                         <button
                           className="inline-flex items-center justify-center h-8 w-8 rounded-md text-emerald-600 bg-emerald-50 hover:bg-emerald-100 ring-1 ring-inset ring-emerald-200"
                           title="Aceptar"
-                          onClick={() => openConfirm("accept", r)}
-                        >
+                          onClick={() => openConfirm("accept", r)}>
                           <Check size={18} />
                         </button>
                         <button
                           className="inline-flex items-center justify-center h-8 w-8 rounded-md text-rose-600 bg-rose-50 hover:bg-rose-100 ring-1 ring-inset ring-rose-200"
                           title="Rechazar"
-                          onClick={() => openConfirm("reject", r)}
-                        >
+                          onClick={() => openConfirm("reject", r)}>
                           <X size={18} />
                         </button>
                       </div>

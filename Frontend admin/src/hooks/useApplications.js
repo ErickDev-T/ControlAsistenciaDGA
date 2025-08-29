@@ -24,14 +24,18 @@ export function useApplications() {
     return () => abort?.();
   }, [load]);
 
-  const removeByCodigo = useCallback((codigo) => {
-    setData((prev) => prev.filter((r) => r.codigo !== codigo && r.Codigo !== codigo));
+  const removeById = useCallback((id) => {
+    setData((prev) => prev.filter((r) => r.id !== id && r.Id !== id));
   }, []);
 
-  const remove = useCallback(async (codigo) => {
-    await deleteApplication(codigo);
-    removeByCodigo(codigo);
-  }, [removeByCodigo]);
+  const remove = useCallback(async (id) => {
+    await deleteApplication(id);
+    removeById(id);
+  }, [removeById]);
+  //ver lo que me esta mandando la api
 
-  return { data, loading, error, removeByCodigo, remove, refresh: load };
+  return { data, loading, error, removeById, remove, refresh: load };
+
+  
+
 }
