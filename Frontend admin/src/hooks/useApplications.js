@@ -32,6 +32,10 @@ export function useApplications() {
     await deleteApplication(codigo);
     removeByCodigo(codigo);
   }, [removeByCodigo]);
+  //ver lo que me esta mandando la api
 
   return { data, loading, error, removeByCodigo, remove, refresh: load };
+
+  
+
 }

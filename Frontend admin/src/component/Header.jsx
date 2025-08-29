@@ -8,8 +8,11 @@ export default function Header({ onDateChange, selectedDate = "", pendingCount }
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         {/* logo + nombre */}
         <div className="flex items-center gap-3">
-          <img src={logo} alt="DGA" className="h-9 w-auto select-none" />
-          <span className="text-white font-semibold text-lg">Portal Asistencia</span>
+          <img src={logo} alt="DGA" className="h-12 w-auto select-none" />
+          <div className="grid-cols-2">
+            <span className="text-[25px] text-white font-semibold text-lg">Portal Asistencia</span>
+            <p className="text-[12px] text-white font-semibold text-lg">Direccion general de aduanas</p>
+          </div>
         </div>
 
         {/* links centro/izquierda */}
