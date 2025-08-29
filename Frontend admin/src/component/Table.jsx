@@ -1,6 +1,5 @@
 // src/components/Table.jsx
 import { useMemo, useState } from "react";
-import { useApplications } from "../hooks/useApplications";
 import ConfirmDialog from "./ConfirmDialog";
 import Swal from "sweetalert2";
 import { handleViewDoc } from "../utils/alertDoc";
@@ -8,12 +7,24 @@ import { Search, FileText, Check, X } from "lucide-react";
 
 const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : "");
 const norm = (v) =>
-  (v ?? "").toString().toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+  (v ?? "")
+    .toString()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+    
+const getRowKey = (r, i) => {
+  const id = r.id ?? r.Id;
+  if (id !== undefined && id !== null) return `${id}-${i}`;
+  const codigo = r.codigo ?? r.Codigo ?? 'row';
+  const fe = r.fechaEntrada ?? r.FechaEntrada ?? '';
+  const he = r.horaEntrada ?? r.HoraEntrada ?? '';
+  return `${codigo}-${fe}-${he}-${i}`;
+};
 
-// selectedDate en formato YYYY-MM-DD
+// formato YYYY-MM-DD
 export default function Table({ selectedDate = "", controller }) {
-  const local = useApplications();
-  const { data, loading, error, remove } = controller ?? local;
+  const { data = [], loading = false, error = "", remove = () => {} } = controller ?? {};
 
   const [query, setQuery] = useState("");
   const [dialog, setDialog] = useState({ open: false, action: null, row: null });
@@ -22,14 +33,17 @@ export default function Table({ selectedDate = "", controller }) {
   const closeConfirm = () => setDialog({ open: false, action: null, row: null });
 
   const filtered = useMemo(() => {
-    let rows = Array.isArray(data) ? data : [];
+    let rows = Array.isArray(data) ? data : [];    
 
     const q = norm(query.trim());
     if (q) {
+      const tokens = q.split(/\s+/).filter(Boolean);
       rows = rows.filter((r) => {
-        const codigo = String(r.codigo ?? r.Codigo ?? "");
-        const nombre = norm(r.nombreApellido ?? r.NombreApellido ?? "");
-        return codigo.includes(query.trim()) || nombre.includes(q);
+        const codigoRaw = String(r.codigo ?? r.Codigo ?? "");
+        const nombreRaw = r.nombreApellido ?? r.NombreApellido ?? r.nombre ?? r.Nombre ?? "";
+        const apellidoRaw = r.apellido ?? r.Apellido ?? "";
+        const haystack = norm([codigoRaw, nombreRaw, apellidoRaw].join(" "));
+        return tokens.every((t) => haystack.includes(t));
       });
     }
 
@@ -122,8 +136,8 @@ export default function Table({ selectedDate = "", controller }) {
       </div>
 
       {/* tabla */}
-      <div className="overflow-hidden rounded-xl border border-slate-200 shadow">
-        <div className="overflow-x-auto">
+      <div className="rounded-xl border border-slate-200 shadow max-h-[70vh] overflow-auto">
+        <div className="min-w-full">
           <table className="min-w-full">
             <thead className="bg-gradient-to-r from-white text-blue sticky top-0 z-10">
               <tr>
@@ -147,7 +161,7 @@ export default function Table({ selectedDate = "", controller }) {
 
                 return (
                   <tr
-                    key={codigo}
+                    key={getRowKey(r, i)}
                     className={`transition-colors ${i % 2 ? "bg-slate-50/50" : "bg-white"} hover:bg-slate-100`}>
                     <td className="px-4 py-3">{codigo}</td>
                     <td className="px-4 py-3">{nombre}</td>

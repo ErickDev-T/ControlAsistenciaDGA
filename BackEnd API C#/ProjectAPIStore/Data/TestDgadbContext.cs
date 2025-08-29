@@ -28,7 +28,8 @@ public partial class TestDgadbContext : DbContext
       entity.HasKey(e => e.Codigo).HasName("PK_Solicitudes");
       entity.ToTable("Solicitudes");
 
-      entity.Property(e => e.Codigo).HasColumnName("Codigo");
+        entity.Property(e => e.Id).HasColumnName("Id");
+        entity.Property(e => e.Codigo).HasColumnName("Codigo");
 
       entity.Property(e => e.NombreApellido)
             .HasMaxLength(150)

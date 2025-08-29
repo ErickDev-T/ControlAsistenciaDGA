@@ -8,6 +8,7 @@ namespace ProjectAPIStore.Models;
 [Table("Solicitudes")]
 public class Solicitud
 {
+  public int Id { get; set; }
   public int Codigo { get; set; }
   public string NombreApellido { get; set; } = "";
   public TimeSpan HoraEntrada { get; set; }

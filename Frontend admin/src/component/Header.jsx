@@ -9,25 +9,29 @@ export default function Header({ onDateChange, selectedDate = "", pendingCount }
         {/* logo + nombre */}
         <div className="flex items-center gap-3">
           <img src={logo} alt="DGA" className="h-12 w-auto select-none" />
-          <div className="grid-cols-2">
-            <span className="text-[25px] text-white font-semibold text-lg">Portal Asistencia</span>
-            <p className="text-[12px] text-white font-semibold text-lg">Direccion general de aduanas</p>
+          <div className="flex flex-col leading-tight">
+            <span className="text-[25px] text-white font-semibold">Portal Asistencia</span>
+            <p className="text-[12px] text-white font-semibold">Dirección general de aduanas</p>
           </div>
         </div>
+
 
         {/* links centro/izquierda */}
 
 
         <div className="flex items-center gap-3">
+
+          {typeof pendingCount === "number" && (
+            <span className="hidden sm:inline-block text-sm px-2.5 py-1 rounded-md bg-blue-600/20 text-blue-200 border border-blue-400/30">
+              Pendientes totales: {pendingCount}
+            </span>
+          )}
+
           <p className="hidden sm:inline-block text-sm px-2.5 py-1 rounded-md bg-blue-600/20 text-blue-200 border border-blue-400/30">
             Filtro Entrada
           </p>
 
-          {typeof pendingCount === "number" && (
-            <span className="hidden sm:inline-block text-xs px-2 py-1 rounded-md bg-amber-500/20 text-amber-200 border border-amber-400/30">
-              Pendientes totales: {pendingCount}
-            </span>
-          )}
+
 
           {/* filtro por fecha */}
           <label className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-md text-sm text-white/90 border border-white/10">
