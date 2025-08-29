@@ -5,40 +5,40 @@ import Swal from "sweetalert2";
 import { handleViewDoc } from "../utils/alertDoc";
 import { Search, FileText, Check, X } from "lucide-react";
 
-const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : "");
-const norm = (v) =>
+const fmtDate = (iso) => (iso ? new Date(iso).toLocaleDateString("es-DO") : ""); //"2025-08-27T00:00:00"= "27/8/2025"
+
+const norm = (v) => // normalizar la fecha
   (v ?? "")
-    .toString()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+    .toString() // solo texto
+    .toLowerCase() //minuscula todo
+    .normalize("NFD") // si tiene tilde se la quita 
+    .replace(/[\u0300-\u036f]/g, ""); // signos no comunes
     
+// genera una clave unica para cada fila de la tabla 
+// react pueda identificar y renderizar cada <tr> de forma estable.
 const getRowKey = (r, i) => {
   const id = r.id ?? r.Id;
-  if (id !== undefined && id !== null) return `${id}-${i}`;
-  const codigo = r.codigo ?? r.Codigo ?? 'row';
-  const fe = r.fechaEntrada ?? r.FechaEntrada ?? '';
-  const he = r.horaEntrada ?? r.HoraEntrada ?? '';
-  return `${codigo}-${fe}-${he}-${i}`;
+  if (id !== undefined && id !== null) return `${id}-${i}`; //
 };
 
 // formato YYYY-MM-DD
 export default function Table({ selectedDate = "", controller }) {
+  
   const { data = [], loading = false, error = "", remove = () => {} } = controller ?? {};
-
   const [query, setQuery] = useState("");
   const [dialog, setDialog] = useState({ open: false, action: null, row: null });
-
   const openConfirm = (action, row) => setDialog({ open: true, action, row });
   const closeConfirm = () => setDialog({ open: false, action: null, row: null });
-
   const filtered = useMemo(() => {
+
     let rows = Array.isArray(data) ? data : [];    
 
     const q = norm(query.trim());
+    // busca en codigo, nombre y apellido que coincidan con los tokens
+
     if (q) {
-      const tokens = q.split(/\s+/).filter(Boolean);
-      rows = rows.filter((r) => {
+      const tokens = q.split(/\s+/).filter(Boolean); //separa texto en palabras //.filter elimina espacios dobles
+      rows = rows.filter((r) => { //recorre todo y se queda con las filas que coincidan 
         const codigoRaw = String(r.codigo ?? r.Codigo ?? "");
         const nombreRaw = r.nombreApellido ?? r.NombreApellido ?? r.nombre ?? r.Nombre ?? "";
         const apellidoRaw = r.apellido ?? r.Apellido ?? "";
@@ -46,16 +46,17 @@ export default function Table({ selectedDate = "", controller }) {
         return tokens.every((t) => haystack.includes(t));
       });
     }
-
+    //filtrar por fecha
     if (selectedDate) {
       rows = rows.filter((r) => {
         const raw = r.fechaEntrada ?? r.FechaEntrada ?? null;
-        if (!raw) return false;
-        const d = new Date(raw);
-        const key =
+        if (!raw) return false; // si no hay fecha, descartar la fil
+        const d = new Date(raw); // convertir a objeto Date
+        const key = //normaliza la fecha
           `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
             d.getDate()
-          ).padStart(2, "0")}`;
+          ).padStart(2, "0")}`;               //meses en  js son de el 0-11 por eso +1
+            // comparar con la fecha seleccionada
         return key === selectedDate;
       });
     }
@@ -70,13 +71,13 @@ export default function Table({ selectedDate = "", controller }) {
 
     try {
       if (action === "reject") {
-        const id = row.codigo ?? row.Codigo;
-        await remove(id); // llama al hook para borrar y actualizar estado
+        const id = row.id ?? row.Id; 
+        await remove(id);
 
         Swal.fire({
           icon: "success",
           title: "Solicitud eliminada",
-          text: `${row.nombreApellido ?? row.NombreApellido ?? ""} (#${id})`,
+          text: `${row.nombreApellido ?? row.NombreApellido ?? ""} (Id #${id})`,
           timer: 1400,
           showConfirmButton: false,
         });
