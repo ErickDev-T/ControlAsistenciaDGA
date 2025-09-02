@@ -18,10 +18,11 @@ public partial class TestDgadbContext : DbContext
     }
 
   public DbSet<Solicitud> Solicitudes { get; set; } = null!; // 👈
+    public DbSet<User> Users { get; set; }
 
 
 
-  protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
         modelBuilder.Entity<Solicitud>(entity =>
         {

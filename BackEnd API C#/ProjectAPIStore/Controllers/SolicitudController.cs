@@ -16,7 +16,7 @@ namespace ProjectAPIStore.Controllers
       _context = context;
     }
 
-    // GET api/solicitudes/listed
+    // GET trae todos las solicitudes
     [HttpGet("listed")]
     public async Task<ActionResult<List<Solicitud>>> GetSolicitudes()
     {
@@ -24,7 +24,7 @@ namespace ProjectAPIStore.Controllers
       return Ok(solicitudes);
     }
 
-    // DELETE api/solicitudes/5
+    // DELETE api/solicitudes/5 elimina por ID
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteSolicitud(int id)
     {
@@ -39,7 +39,7 @@ namespace ProjectAPIStore.Controllers
     }
 
 
-        // GET api/solicitudes/5
+        // GET api/solicitudes/5  Trae solicitud por ID
         [HttpGet("{id:int}")]
     public async Task<ActionResult<Solicitud>> GetSolicitud(int id)
     {
@@ -49,5 +49,11 @@ namespace ProjectAPIStore.Controllers
 
       return Ok(solicitud);
     }
-  }
+
+        
+
+
+
+
+    }
 }   
