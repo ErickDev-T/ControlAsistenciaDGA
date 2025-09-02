@@ -4,13 +4,13 @@ import { ClipboardList, FilePlus, ListChecks, BarChart3 } from "lucide-react";
 const CARDS = [
   {
     to: "/FormStandar",
-    title: "Formulario 1",
+    title: "De un dia para otro..",
     desc: "Registrar asistencia estándar.",
     icon: ClipboardList,
   },
   {
     to: "/formulario2",
-    title: "Formulario 2",
+    title: "mismo dia",
     desc: "Registro por código y horario.",
     icon: FilePlus,
   },

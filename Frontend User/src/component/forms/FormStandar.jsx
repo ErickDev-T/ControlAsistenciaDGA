@@ -28,7 +28,6 @@ export default function FormStandar() {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    // TODO: aquí enviarás el resto del formulario
     
   };
 
@@ -37,7 +36,7 @@ export default function FormStandar() {
       <h2 className="text-xl font-bold text-slate-800 mb-4">Formulario 1</h2>
 
       <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Código + Buscar + Nombre */}
+        {/* codigo + buscar + nombre */}
         <div className="flex gap-2 col-span-1 md:col-span-2">
           <input
             type="text"
@@ -66,21 +65,21 @@ export default function FormStandar() {
           />
         </div>
 
-        {/* Fechas y horas */}
+        {/* fechas y horas */}
         <input type="date" placeholder="Fecha entrada" className="rounded-md border-slate-300 shadow-sm focus:border-slate-900 focus:ring focus:ring-slate-900/20" />
         <input type="time" placeholder="Hora entrada" className="rounded-md border-slate-300 shadow-sm focus:border-slate-900 focus:ring focus:ring-slate-900/20" />
         <input type="date" placeholder="Fecha salida" className="rounded-md border-slate-300 shadow-sm focus:border-slate-900 focus:ring focus:ring-slate-900/20" />
         <input type="time" placeholder="Hora salida" className="rounded-md border-slate-300 shadow-sm focus:border-slate-900 focus:ring focus:ring-slate-900/20" />
 
-        {/* Documento */}
+        {/* documento */}
         <input type="file" className="col-span-1 md:col-span-2 rounded-md border-slate-300 shadow-sm focus:border-slate-900 focus:ring focus:ring-slate-900/20" />
 
-        {/* Error */}
+        {/* error */}
         {err && (
           <div className="col-span-1 md:col-span-2 text-sm text-red-600">{err}</div>
         )}
 
-        {/* Enviar */}
+        {/* enviar */}
         <div className="col-span-1 md:col-span-2 flex justify-end">
           <button type="submit" className="px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">
             Enviar

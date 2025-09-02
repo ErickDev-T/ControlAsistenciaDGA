@@ -8,7 +8,7 @@ export async function getUsuarioByCode(code, signal) {
   });
 
   if (!res.ok) {
-    // El backend a veces devuelve 404 con usuario no encontrado"
+    // el backend a veces devuelve 404 con usuario no encontrado"
     const msg = await res.text().catch(() => "");
     throw new Error(msg || `HTTP ${res.status}`);
   }
