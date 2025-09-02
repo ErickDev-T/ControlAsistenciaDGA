@@ -76,8 +76,8 @@ namespace ProjectAPIStore.Controllers
             var solicitud = new Solicitud
             {
                 PersonaId = persona.Id,             
-                Codigo = persona.Codigo,                // (opcional) denormalizado
-                NombreApellido = persona.NombreApellido,// (opcional) denormalizado
+                Codigo = persona.Codigo,                
+                NombreApellido = persona.NombreApellido,
 
                 FechaEntrada = dto.EntryDate.Date,
                 HoraEntrada = dto.EntryTime,

@@ -14,7 +14,6 @@ public class Solicitud
     public int PersonaId { get; set; }
     public User Persona { get; set; } = null!; // navegación
 
-    // (opcional) Si además quieres guardar el código y el nombre “denormalizado”
     public int Codigo { get; set; }
     public string NombreApellido { get; set; } = "";
 

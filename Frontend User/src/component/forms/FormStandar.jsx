@@ -40,9 +40,11 @@ export default function FormStandar() {
     if (!codigo?.toString().trim()) return "Ingresa un código";
     if (!entryDate) return "Ingresa la fecha de entrada";
     if (!entryTime) return "Ingresa la hora de entrada";
+    if (!exitDate) return "Ingresa la fecha de salida";
+    if (!exitTime) return "Ingresa la hora de salida";
     // salida opcional: si pones hora/fecha salida, mejor que estén ambas
-    if ((exitDate && !exitTime) || (!exitDate && exitTime))
-      return "Completa ambos campos de salida (fecha y hora) o deja ambos vacíos";
+    if ((!exitDate && !exitTime) || (!exitDate && !exitTime))
+      return "Completar todos los campos";
     return "";
   };
 
@@ -58,12 +60,10 @@ export default function FormStandar() {
     try {
       setSubmitting(true);
 
-      // 1) Si hay archivo y tienes un endpoint de upload, súbelo primero
       let documentUrl = null;
       let documentType = null;
 
       if (file) {
-        // Si no tienes endpoint, comenta estas líneas y deja documentUrl/documentType en null
         const up = await uploadFile(file, ctrl.signal);
         documentUrl = up?.url ?? null;
         documentType = up?.contentType ?? (file.type || null);
@@ -71,9 +71,9 @@ export default function FormStandar() {
 
       // 2) Armar payload que tu API espera
       const payload = {
-        code: Number(codigo),     // <- tu endpoint usa "code"
-        entryDate,                // "2025-09-01"
-        entryTime,                // "08:00"
+        code: Number(codigo),     
+        entryDate,                // ej 2025-09-01"
+        entryTime,                // ej 08:00
         exitDate: exitDate || null,
         exitTime: exitTime || null,
         documentUrl,
@@ -84,8 +84,8 @@ export default function FormStandar() {
       await saveSolicitudFromCode(payload, ctrl.signal);
 
       setOkMsg("Solicitud guardada con éxito ✅");
-      // Limpia campos (deja nombre por si lo quieres conservar)
-      // setNombre(""); // si quieres resetear también el nombre
+      setCodigo("")
+      setNombre(""); 
       setEntryDate("");
       setEntryTime("");
       setExitDate("");
@@ -99,13 +99,14 @@ export default function FormStandar() {
   };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-white rounded-xl shadow-md">
+    <div className="p-6 max-w-3xl mx-auto bg-white rounded-xl shadow-md mt-10">
       <h2 className="text-xl font-bold text-slate-800 mb-4">Formulario 1</h2>
 
       <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* codigo + buscar + nombre */}
         <div className="flex gap-2 col-span-1 md:col-span-2">
           <input
+             
             type="text"
             inputMode="numeric"
             value={codigo}
@@ -124,6 +125,7 @@ export default function FormStandar() {
             {loading ? "Buscando..." : "Buscar"}
           </button>
           <input
+            disabled
             type="text"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
