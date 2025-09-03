@@ -6,10 +6,9 @@ namespace ProjectAPIStore.Models;
 [Table("Personas")]   // 👈 aquí va Personas
 public class User
 {
-    [Key]
     public int Id { get; set; }
-
     public int Codigo { get; set; }
+    public string NombreApellido { get; set; } = "";
 
-    public string NombreApellido { get; set; } = string.Empty;
+    public ICollection<Solicitud> Solicitudes { get; set; } = new List<Solicitud>();
 }

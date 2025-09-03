@@ -17,7 +17,7 @@ public partial class TestDgadbContext : DbContext
     {
     }
 
-  public DbSet<Solicitud> Solicitudes { get; set; } = null!; // 👈
+  public DbSet<Solicitud> Solicitudes { get; set; } = null!; 
     public DbSet<User> Users { get; set; }
 
 
