@@ -72,7 +72,7 @@ namespace ProjectAPIStore.Controllers
                 if (salida < entrada) return BadRequest("La salida no puede ser anterior a la entrada.");
             }
 
-            // 3) Construir la entidad con PersonaId
+            // construir la entidad con PersonaId
             var solicitud = new Solicitud
             {
                 PersonaId = persona.Id,             

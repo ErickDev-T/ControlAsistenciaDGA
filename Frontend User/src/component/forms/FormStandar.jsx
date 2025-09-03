@@ -103,31 +103,32 @@ export default function FormStandar() {
         {/* codigo + buscar + nombre */}
         <div className="flex gap-2 col-span-1 md:col-span-2">
           <input
+          
             type="text"
             inputMode="numeric"
             value={codigo}
             onChange={(e) => setCodigo(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && onBuscar()}
             placeholder="Código"
-            className="flex-1 rounded-lg border border-blue-200 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-          />
+            className="flex-1 rounded-lg border border-blue-200 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"/>
+          
           <button
             type="button"
             onClick={onBuscar}
             disabled={loading}
             className="px-5 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-60 transition"
-            aria-label="Buscar por código"
-          >
+            aria-label="Buscar por código">
             {loading ? "Buscando..." : "Buscar"}
           </button>
+
           <input
             disabled
             type="text"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             placeholder="Nombre y Apellido"
-            className="flex-1 rounded-lg border border-blue-200 shadow-sm bg-gray-50 text-gray-600"
-          />
+            className="flex-1 rounded-lg border border-blue-200 shadow-sm bg-gray-50 text-gray-600"/>
+
         </div>
 
         {/* fechas y horas */}

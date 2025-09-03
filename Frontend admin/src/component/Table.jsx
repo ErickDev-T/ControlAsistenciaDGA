@@ -100,7 +100,7 @@ export default function Table({ selectedDate = "", controller }) {
   };
 
   if (loading) return <div className="p-6">Cargando...</div>;
-  if (error)   return <div className="p-6 text-red-600">Error: {String(error)}</div>;
+  //if (error)   return <div className="p-6 text-red-600">Error: {String(error)}</div>;
   //pop up para botones aceptar o rechazar  
   const dialogText =
     dialog.action === "accept"
