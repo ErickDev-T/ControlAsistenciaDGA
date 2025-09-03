@@ -20,7 +20,7 @@ export default function Header() {
 
         <nav className="absolute top-5 right-10 text-2xl space-x-8 text-white font-medium hidden sm:flex">
           <a href="/">INICIO</a>
-          <a href="#">GUÍA DE USO</a>
+          <a href="/">GUÍA DE USO</a>
           <a href="#">AYUDA</a>
         </nav>
       </div>
