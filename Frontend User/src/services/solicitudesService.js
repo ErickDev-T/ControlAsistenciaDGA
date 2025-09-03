@@ -10,16 +10,15 @@ export async function uploadFile(file, signal) {
 
 
 export async function saveSolicitudFromCode(payload, signal) {
-  const res = await fetch("https://localhost:44351/api/Solicitudes/from-code", {
+  const res = await fetch("/api/Solicitudes/from-code", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-    signal
+    signal,
   });
-
   if (!res.ok) {
     const txt = await res.text().catch(() => "");
-    throw new Error(txt || "Error al guardar la solicitud");
+    throw new Error(`HTTP ${res.status} ${res.statusText} – ${txt}`);
   }
-  return res.json(); 
+  return res.json();
 }
