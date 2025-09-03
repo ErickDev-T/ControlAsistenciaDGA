@@ -1,33 +1,39 @@
-import { Facebook, Twitter, Linkedin, Mail } from "lucide-react";
-import logo from "../assets/dgaLogo.svg";
-import { X as XIcon } from "lucide-react";
+import { Facebook, Twitter, Linkedin, Mail, X as XIcon } from "lucide-react";
+import Logo from "../assets/dgaLogo.svg";
+import { Link } from "react-router-dom";
 
-export default function Footer() {
+
+export const Footer = () => {
   return (
     <footer className="bg-slate-900 text-slate-300 mt-12">
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Brand */}
-        <div className="flex items-center gap-3">
-          <img src={logo} alt="DGA" className="h-12 w-auto select-none" />
-          <div className="flex flex-col leading-tight">
-            <span className="text-[25px] text-white font-semibold">Portal Asistencia</span>
-            <p className="text-[12px] text-white font-semibold">Dirección general de aduanas</p>
+        {/* brand */}
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <img src={Logo} alt="DGA Logo" className="h-10 w-auto" />
+            <span className="text-white font-semibold text-lg">Portal Asistencia</span>
           </div>
+          <p className="text-sm text-slate-400">
+            Sistema de control de asistencia para la DGA.
+          </p>
         </div>
 
 
-        {/* Enlaces */}
+
+        {/* enlaces */}
         <div>
           <h4 className="text-white font-semibold mb-3">Enlaces</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#inicio" className="hover:text-white">Inicio</a></li>
+            <li><a to="/" className="hover:text-white">Inicio</a></li>
             <li><a href="#solicitudes" className="hover:text-white">Solicitudes</a></li>
             <li><a href="#reportes" className="hover:text-white">Reportes</a></li>
             <li><a href="#contacto" className="hover:text-white">Contacto</a></li>
           </ul>
         </div>
 
-        {/* Contacto */}
+
+
+        {/* contacto */}
         <div>
           <h4 className="text-white font-semibold mb-3">Contáctanos</h4>
           <p className="text-sm">info@aduanas.gob.do</p>
@@ -41,7 +47,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Copy */}
+      {/* copy */}
       <div className="border-t border-slate-700 py-4 text-center text-xs text-slate-500">
         © {new Date().getFullYear()} DGA · Todos los derechos reservados.
       </div>
