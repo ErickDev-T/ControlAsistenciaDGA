@@ -1,5 +1,6 @@
 import { Facebook, Twitter, Linkedin, Mail, X as XIcon } from "lucide-react";
 import Logo from "../assets/dgaLogo.svg";
+import { Link } from "react-router-dom";
 
 
 export const Footer = () => {
@@ -23,7 +24,7 @@ export const Footer = () => {
         <div>
           <h4 className="text-white font-semibold mb-3">Enlaces</h4>
           <ul className="space-y-2 text-sm">
-            <li><a href="#inicio" className="hover:text-white">Inicio</a></li>
+            <li><a to="/" className="hover:text-white">Inicio</a></li>
             <li><a href="#solicitudes" className="hover:text-white">Solicitudes</a></li>
             <li><a href="#reportes" className="hover:text-white">Reportes</a></li>
             <li><a href="#contacto" className="hover:text-white">Contacto</a></li>

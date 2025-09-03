@@ -1,25 +1,18 @@
-import Header from './component/Header'
-import { Footer } from './component/Footer'
-import HomePage from './component/HomePage'
-import { Routes, Route } from 'react-router-dom'
-import FormStandar from "./component/forms/FormStandar";
+// src/App.jsx
+import Header from "./component/Header";
+import { Footer } from "./component/Footer";
+import AppRoutes from "./routes/AppRoutes";
 
-function App() {
+export default function App() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-100">
       <Header />
 
-      {/* Contenido principal */}
       <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/FormStandar" element={<FormStandar />} />
-        </Routes>
+        <AppRoutes />
       </main>
 
       <Footer />
     </div>
-  )
+  );
 }
-
-export default App
