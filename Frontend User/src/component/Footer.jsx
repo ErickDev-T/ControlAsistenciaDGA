@@ -20,7 +20,7 @@ export const Footer = () => {
 
 
 
-        {/* enlaces */}
+        {/* enlaces*/}
         <div>
           <h4 className="text-white font-semibold mb-3">Enlaces</h4>
           <ul className="space-y-2 text-sm">
