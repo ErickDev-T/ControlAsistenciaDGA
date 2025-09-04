@@ -10,7 +10,7 @@ const CARDS = [
     icon: ClipboardList,
   },
   {
-    to: "/formulario2",
+    to: "/FormSameDay",
     title: "Mismo día",
     desc: "Registro por código y horario.",
     icon: FilePlus,

@@ -31,8 +31,6 @@ export default function Header({ onDateChange, selectedDate = "", pendingCount }
             Filtro Entrada
           </p>
 
-
-
           {/* filtro por fecha */}
           <label className="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-md text-sm text-white/90 border border-white/10">
             <Calendar size={16} aria-hidden="true" />

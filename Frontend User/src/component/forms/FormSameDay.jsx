@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getUsuarioByCode } from "../../services/usuarios";
 import { saveSolicitudFromCode, uploadFile } from "../../services/solicitudesService";
 import { uploadFileBySolicitudId } from "../../services/uploads";
@@ -16,6 +16,10 @@ export default function FormStandar() {
   const [submitting, setSubmitting] = useState(false);
   const [err, setErr] = useState("");
   const [okMsg, setOkMsg] = useState("");
+
+  useEffect(() => {
+    setExitDate(entryDate || "");
+  }, [entryDate]);
 
   const onBuscar = async () => {
     setErr("");
@@ -41,7 +45,7 @@ export default function FormStandar() {
     if (!codigo?.toString().trim()) return "Ingresa un código";
     if (!entryDate) return "Ingresa la fecha de entrada";
     if (!entryTime) return "Ingresa la hora de entrada";
-    if (!exitDate) return "Ingresa la fecha de salida";
+    // exitDate ya se iguala a entryDate
     if (!exitTime) return "Ingresa la hora de salida";
     return "";
   };
@@ -63,7 +67,7 @@ export default function FormStandar() {
         code: Number(codigo),
         entryDate,
         entryTime,
-        exitDate: exitDate || null,
+        exitDate: entryDate,     //  igual a la de entrada
         exitTime: exitTime || null,
         documentUrl: null,
         documentType: null,
@@ -106,75 +110,71 @@ export default function FormStandar() {
   return (
     <div className="p-8 max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border border-blue-100 mt-12">
       <h2 className="text-2xl font-bold text-blue-800 mb-2 text-center">
-        Formulario de Registro
+        Formulario de Registro mismo dia
       </h2>
       <p className="text-center text-sm text-gray-600 mb-6">
-        Completa los datos y adjunta, si aplica, el documento de soporte.
+        Ingresa el código, confirma el nombre y completa fecha/hora. Adjunta un documento si aplica.
       </p>
 
       <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-7">
-        {/* Bloque: Código / Buscar / Nombre */}
+        {/* Código + Buscar */}
         <div className="col-span-1 md:col-span-2">
-          <div className="col-span-1 md:col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Código del empleado <span className="text-red-500">*</span>
-            </label>
-
-            <div className="mt-1 flex items-center gap-3">
-              <input
-                type="text"
-                inputMode="numeric"
-                value={codigo}
-                onChange={(e) => setCodigo(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && onBuscar()}
-                placeholder="Ej.: 1001"
-                className="flex-1 h-11 rounded-xl border border-blue-200 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-                aria-describedby="codigo-help"
-              />
-
-              <button
-                type="button"
-                onClick={onBuscar}
-                disabled={loading}
-                className="h-11 px-5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-60 transition"
-                aria-label="Buscar por código"
-              >
-                {loading ? "Buscando..." : "Buscar"}
-              </button>
-            </div>
-
-            <p id="codigo-help" className="mt-1 text-xs text-gray-500">
-              Ingresa el código y presiona <b>Buscar</b> para traer el nombre.
-            </p>
-          </div>
-
-          <div className="mt-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre y Apellido
-            </label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Código del empleado <span className="text-red-500">*</span>
+          </label>
+          <div className="flex items-end gap-3">
             <input
-              disabled
               type="text"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              placeholder="—"
-              className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm bg-gray-50 text-gray-600"
+              inputMode="numeric"
+              value={codigo}
+              onChange={(e) => setCodigo(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && onBuscar()}
+              placeholder="Ej.: 1001"
+              className="flex-1 rounded-xl border border-blue-200 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
+              aria-describedby="codigo-help"
             />
+            <button
+              type="button"
+              onClick={onBuscar}
+              disabled={loading}
+              className="h-[42px] px-5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-60 transition"
+              aria-label="Buscar por código"
+            >
+              {loading ? "Buscando..." : "Buscar"}
+            </button>
           </div>
+          <p id="codigo-help" className="mt-1 text-xs text-gray-500">
+            Escribe el código y presiona <b>Buscar</b> para cargar el nombre.
+          </p>
         </div>
 
-        {/* Bloque: Fechas y Horas */}
+        {/* Nombre */}
+        <div className="col-span-1 md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Nombre y Apellido
+          </label>
+          <input
+            disabled
+            type="text"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            placeholder="—"
+            className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm bg-gray-50 text-gray-600"
+          />
+        </div>
+
+        {/* Sección: Fechas y horas */}
         <div className="col-span-1 md:col-span-2">
           <div className="flex items-center gap-2 mb-2">
             <div className="h-1 w-8 bg-blue-600 rounded-full"></div>
             <h3 className="text-sm font-semibold text-blue-800 uppercase tracking-wide">
-              Fechas y Horas
+              Fechas y horas
             </h3>
           </div>
         </div>
 
         {/* Fecha de entrada */}
-        <div>
+        <div >
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Fecha de entrada <span className="text-red-500">*</span>
           </label>
@@ -182,7 +182,7 @@ export default function FormStandar() {
             type="date"
             value={entryDate}
             onChange={(e) => setEntryDate(e.target.value)}
-            className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
+            className="w-full h-11 rounded-xl border border-blue-200 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
           />
           <p className="mt-1 text-xs text-gray-500">Día de inicio de la jornada.</p>
         </div>
@@ -194,40 +194,29 @@ export default function FormStandar() {
           </label>
           <input
             type="time"
+            step="60"
             value={entryTime}
             onChange={(e) => setEntryTime(e.target.value)}
-            className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
+            className="w-full h-11 rounded-xl border border-blue-200 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
           />
           <p className="mt-1 text-xs text-gray-500">Ej.: 08:00</p>
         </div>
 
-        {/* Fecha de salida */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Fecha de salida <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="date"
-            value={exitDate}
-            onChange={(e) => setExitDate(e.target.value)}
-            className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-          />
-          <p className="mt-1 text-xs text-gray-500">Día de cierre de la jornada.</p>
-        </div>
-
-        {/* Hora de salida */}
-        <div>
+        {/* Hora de salida  */}
+        <div className="col-span-1 md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Hora de salida <span className="text-red-500">*</span>
           </label>
           <input
             type="time"
+            step="60"
             value={exitTime}
             onChange={(e) => setExitTime(e.target.value)}
-            className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
+            className="w-full h-11 rounded-xl border border-blue-200 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
           />
           <p className="mt-1 text-xs text-gray-500">Ej.: 16:00</p>
         </div>
+
 
         {/* Documento */}
         <div className="col-span-1 md:col-span-2">
@@ -244,10 +233,11 @@ export default function FormStandar() {
           <input
             type="file"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+            accept="image/*,application/pdf"
             className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
           />
           <p className="mt-1 text-xs text-gray-500">
-            Formatos permitidos: PDF o imagen
+            Formatos permitidos: PDF o imagen.
           </p>
         </div>
 
@@ -264,24 +254,7 @@ export default function FormStandar() {
         )}
 
         {/* Acciones */}
-        <div className="col-span-1 md:col-span-2 flex justify-end gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              // Limpieza rápida del form controlado
-              setCodigo("");
-              setNombre("");
-              setEntryDate("");
-              setEntryTime("");
-              setExitDate("");
-              setExitTime("");
-              setFile(null);
-            }}
-            className="px-5 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 transition"
-          >
-            Limpiar
-          </button>
-
+        <div className="col-span-1 md:col-span-2 flex justify-end">
           <button
             type="submit"
             disabled={submitting}
