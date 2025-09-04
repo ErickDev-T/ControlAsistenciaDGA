@@ -22,7 +22,7 @@ const CARDS = [
     icon: ListChecks,
   },
 
-  
+
 ];
 
 /** card con theme azul */
@@ -40,8 +40,8 @@ function Card({ to, title, desc, Icon }) {
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="absolute -top-16 -right-20 h-40 w-40 bg-gradient-to-tr from-blue-400/20 via-sky-300/10 to-transparent blur-2xl"/>
-        <div className="absolute -bottom-16 -left-20 h-40 w-40 bg-gradient-to-br from-blue-300/20 via-indigo-200/10 to-transparent blur-2xl"/>
+        <div className="absolute -top-16 -right-20 h-40 w-40 bg-gradient-to-tr from-blue-400/20 via-sky-300/10 to-transparent blur-2xl" />
+        <div className="absolute -bottom-16 -left-20 h-40 w-40 bg-gradient-to-br from-blue-300/20 via-indigo-200/10 to-transparent blur-2xl" />
       </div>
 
       <div className="p-6">
@@ -54,7 +54,7 @@ function Card({ to, title, desc, Icon }) {
               "shadow-md transition-transform duration-300",
               "group-hover:scale-105",
             ].join(" ")}>
-              
+
             {Icon ? <Icon size={22} className="sm:size-6" aria-hidden="true" /> : null}
           </div>
 
@@ -97,28 +97,33 @@ function Card({ to, title, desc, Icon }) {
 
 export default function HomePage() {
   return (
-    <div className="min-h-[calc(50vh)] bg-gradient-to-b from-blue-50 via-white to-blue-50">
-      <div className="px-4 sm:px-6 lg:px-8 py-10">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <header className="mb-10 text-center">
-           
-            <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-blue-900">
-              Portal de Asistencia
-            </h1>
-            <p className="text-blue-700 font-[poppins] mt-2 text-3xl sm:text-2xl">
-              Elige una opción para continuar.
-            </p>
-          </header>
+    <div className="bg-slate-900">
+      <div className="min-h-[calc(75vh)] bg-gradient-to-b from-blue-50 via-white to-blue-50 mr-3 ml-3 rounded-t-lg">
+        <div className="px-4 sm:px-6 lg:px-8 py-10">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
+            <header className="mb-10 text-center mt-20">
 
-          {/* grid responsivo */}
-          <section>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {CARDS.map(({ to, title, desc, icon: Icon }) => (
-                <Card key={title} to={to} title={title} desc={desc} Icon={Icon} />
-              ))}
-            </div>
-          </section>
+              <h1 className="mt-4 text-4xl sm:text-7xl font-light text-black">
+                Gestión de asistencia sin
+              </h1>
+              <h1 className="mt-4 text-4xl sm:text-7xl font-light text-black">
+                complicaciones
+              </h1>
+              <p className="text-black font-[poppins] mt-10 text-3xl sm:text-2xl">
+                Todos los formularios de asistencia, en un solo lugar.
+              </p>
+            </header>
+
+            {/* grid responsivo */}
+            <section>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                {CARDS.map(({ to, title, desc, icon: Icon }) => (
+                  <Card key={title} to={to} title={title} desc={desc} Icon={Icon} />
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
       </div>
     </div>

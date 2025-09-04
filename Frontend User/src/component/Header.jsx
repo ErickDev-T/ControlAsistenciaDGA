@@ -4,38 +4,54 @@ import { Link } from "react-router-dom";
 
 export default function Header() {
   return (
-    <header className="w-full h-[50vh] bg-gradient-to-tr from-blue-900 via-blue-500 to-blue-900 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+    <header className="w-full h-[75px] bg-slate-900">
 
-        <div className="items-center">
-          <div className="grid absolute grid-cols-2 top-3 left-3">
-            <img src={Logo} alt="DGA Logo" className="max-h-21 w-auto" />
-            <div className="text-lg text-white">
-              <p className="font-thin">Plataforma de</p>
-              <p className="font-bold">REGISTRO</p>
-              <p className="font-bold">ASISTENCIA</p>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 py-4 grid grid-cols-2 md:grid-cols-3 items-center gap-4">
+        {/* Col 1: Logo + texto */}
+        <div className="flex items-center gap-3">
+          <img src={Logo} alt="DGA Logo" className="h-10 w-auto"/>
+          <div className="leading-tight text-white">
+            <p className="text-xs font-light">Plataforma de</p>
+            <p className="text-sm font-semibold">REGISTRO</p>
+            <p className="text-sm font-semibold -mt-1">ASISTENCIA</p>
           </div>
         </div>
 
-        <nav className="absolute top-5 right-10 text-2xl space-x-8 text-white font-medium hidden sm:flex">
-          <a href="/">INICIO</a>
-          <a href="/">GUÍA DE USO</a>
-          <a href="#">AYUDA</a>
+        {/* Col 2: Nav (centrado, solo desde md) */}
+        <nav className="hidden md:flex justify-center gap-8 text-white font-medium">
+          <a href="/" className="hover:underline underline-offset-4">INICIO</a>
+          <a href="/" className="hover:underline underline-offset-4">GUÍA DE USO</a>
+          <a href="#" className="hover:underline underline-offset-4">AYUDA</a>
         </nav>
-      </div>
 
-      <div className="mt-25 h-25 max-w-200 bg-[#155594] flex justify-center items-center shadow-2xl">
-        <p className="text-4xl font-semibold text-white">
-          Bienvenido al portal de asistencia
-        </p>
-      </div>
-
-      <div className="text-white flex justify-center">
-        <div className="font-bold mt-10 text-4xl max-w-5xl grid  gap-6 text-center md:text-center">
-          <p>En este portal encontrara todos los formularios necesarios de asistencia</p>
+        {/* Col 3: 3 bolas con iconos (al final) */}
+        <div className="flex justify-end items-center gap-2">
+          <button
+            type="button"
+            title="Notificaciones"
+            className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 ring-1 ring-white/20 backdrop-blur-sm flex items-center justify-center text-white text-lg transition" >
+            🔔
+            <span className="sr-only">Notificaciones</span>
+          </button>
+          <button
+            type="button"
+            title="Ayuda"
+            className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 ring-1 ring-white/20 backdrop-blur-sm flex items-center justify-center text-white text-lg transition">
+            ❓
+            <span className="sr-only">Ayuda</span>
+          </button>
+          <button
+            type="button"
+            title="Perfil"
+            className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 ring-1 ring-white/20 backdrop-blur-sm flex items-center justify-center text-white text-lg transition">
+            👤
+          </button>
         </div>
       </div>
+
+
+
+
     </header>
   );
 }
