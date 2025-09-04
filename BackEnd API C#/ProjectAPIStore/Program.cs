@@ -24,10 +24,10 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// redirigir raíz a Swagger
+// redirigir raiz a Swagger
 app.MapGet("/", ctx =>
 {
-    ctx.Response.Redirect("/swagger/index.html", permanent: false); // direct to that URL
+    ctx.Response.Redirect("/swagger/index.html", permanent: false);
     return Task.CompletedTask;
 });
 

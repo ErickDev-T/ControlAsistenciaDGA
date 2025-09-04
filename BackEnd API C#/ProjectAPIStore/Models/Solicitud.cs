@@ -1,4 +1,3 @@
-// ProjectAPIStore/Models/Solicitud.cs
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,9 +9,8 @@ public class Solicitud
 {
     public int Id { get; set; }
 
-    // Clave foránea obligatoria
     public int PersonaId { get; set; }
-    public User Persona { get; set; } = null!; // navegación
+    public User Persona { get; set; } = null!; 
 
     public int Codigo { get; set; }
     public string NombreApellido { get; set; } = "";

@@ -57,7 +57,7 @@ public partial class TestDgadbContext : DbContext
                   .HasColumnName("HoraSalida");
 
             entity.Property(e => e.UrlDocumento)
-                  .HasMaxLength(500)   // coincide con tu tabla
+                  .HasMaxLength(500)   
                   .IsUnicode(false)
                   .HasColumnName("UrlDocumento");
 
@@ -66,7 +66,7 @@ public partial class TestDgadbContext : DbContext
                   .IsUnicode(false)
                   .HasColumnName("DocumentoTipo");
 
-            // (Opcional) índice por Codigo para búsquedas rápidas
+            // indice por Codigo para busquedas rapidas
             entity.HasIndex(e => e.Codigo);
         });
 

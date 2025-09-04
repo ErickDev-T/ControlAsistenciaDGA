@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { getUsuarioByCode } from "../../services/usuarios";
 import { saveSolicitudFromCode, uploadFile } from "../../services/solicitudesService";
+import { uploadFileBySolicitudId } from "../../services/uploads";
 
 export default function FormStandar() {
   const [codigo, setCodigo] = useState("");
@@ -45,53 +46,62 @@ export default function FormStandar() {
     return "";
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setErr("");
-    setOkMsg("");
+const onSubmit = async (e) => {
+  e.preventDefault();
+  setErr("");
+  setOkMsg("");
 
-    const msg = validate();
-    if (msg) return setErr(msg);
+  const msg = validate();
+  if (msg) return setErr(msg);
 
-    const ctrl = new AbortController();
-    try {
-      setSubmitting(true);
+  const ctrl = new AbortController();
+  try {
+    setSubmitting(true);
 
-      let documentUrl = null;
-      let documentType = null;
+    // primero crear la solicitud sin documento 
+    const payload = {
+      code: Number(codigo),
+      entryDate,
+      entryTime,
+      exitDate: exitDate || null,
+      exitTime: exitTime || null,
+      documentUrl: null,
+      documentType: null,
+    };
 
-      if (file) {
-        const up = await uploadFile(file, ctrl.signal);
-        documentUrl = up?.url ?? null;
-        documentType = up?.contentType ?? (file.type || null);
-      }
+    const sol = await saveSolicitudFromCode(payload, ctrl.signal);
 
-      const payload = {
-        code: Number(codigo),
-        entryDate,
-        entryTime,
-        exitDate: exitDate || null,
-        exitTime: exitTime || null,
-        documentUrl,
-        documentType,
-      };
+    //obtener el id
+    const solicitudId = sol?.id ?? sol?.data?.id ?? sol?.solicitudId ?? null;
 
-      await saveSolicitudFromCode(payload, ctrl.signal);
-
-      setOkMsg("✅ Solicitud guardada con éxito");
-      setCodigo("");
-      setNombre("");
-      setEntryDate("");
-      setEntryTime("");
-      setExitDate("");
-      setExitTime("");
-      setFile(null);
-    } catch (e2) {
-      setErr(e2.message || "❌ No se pudo guardar");
-    } finally {
-      setSubmitting(false);
+    if (!solicitudId) {
+      throw new Error("No se pudo obtener el ID de la solicitud");
     }
-  };
+
+    // subir archivo si hay usando el ID
+    let uploaded = null;
+    if (file) {
+      uploaded = await uploadFileBySolicitudId(solicitudId, file, ctrl.signal);
+      // uploaded = { url, tipo }
+    }
+
+    setOkMsg("Solicitud guardada con éxito");
+    setCodigo("");
+    setNombre("");
+    setEntryDate("");
+    setEntryTime("");
+    setExitDate("");
+    setExitTime("");
+    setFile(null);
+    e.target.reset();
+  } catch (e2) {
+    setErr(e2.message || "No se pudo guardar");
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+
 
   return (
     <div className="p-8 max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border border-blue-100 mt-12">

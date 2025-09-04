@@ -56,7 +56,7 @@ namespace ProjectAPIStore.Controllers
         [HttpPost("from-code")]
         public async Task<ActionResult<Solicitud>> CreateFromCode([FromBody] CreateSolicitudFromCodeDto dto)
         {
-            // 1) Buscar persona por código
+            // buscar persona por código
             var persona = await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(p => p.Codigo == dto.Code);
@@ -64,7 +64,7 @@ namespace ProjectAPIStore.Controllers
             if (persona is null)
                 return NotFound("Usuario/Persona no encontrado");
 
-            // 2) Validación de tiempos
+            //  validacion de tiempos
             if (dto.ExitDate.HasValue && dto.ExitTime.HasValue)
             {
                 var entrada = dto.EntryDate.Date + dto.EntryTime;

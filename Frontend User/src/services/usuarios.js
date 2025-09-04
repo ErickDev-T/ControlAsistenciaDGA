@@ -12,5 +12,5 @@ export async function getUsuarioByCode(code, signal) {
     const msg = await res.text().catch(() => "");
     throw new Error(msg || `HTTP ${res.status}`);
   }
-  return res.json(); // { id, codigo, nombreApellido }
+  return res.json(); //  id codigo nombreApellido }
 }

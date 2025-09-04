@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjectAPIStore.Models;
 
-[Table("Personas")]   // 👈 aquí va Personas
+[Table("Personas")]   
 public class User
 {
     public int Id { get; set; }

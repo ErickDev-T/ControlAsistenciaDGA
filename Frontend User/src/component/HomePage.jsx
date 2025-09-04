@@ -25,7 +25,7 @@ const CARDS = [
   
 ];
 
-/** Card con theme azul */
+/** card con theme azul */
 function Card({ to, title, desc, Icon }) {
   return (
     <div
@@ -36,7 +36,7 @@ function Card({ to, title, desc, Icon }) {
         "hover:-translate-y-0.5 will-change-transform",
       ].join(" ")}
     >
-      {/* Glow decorativo en hover */}
+
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -70,7 +70,7 @@ function Card({ to, title, desc, Icon }) {
           </div>
         </div>
 
-        {/* Acción */}
+        {/* accion */}
         <div className="mt-5">
           <Link
             to={to}
@@ -106,12 +106,12 @@ export default function HomePage() {
             <h1 className="mt-4 text-4xl sm:text-5xl font-bold text-blue-900">
               Portal de Asistencia
             </h1>
-            <p className="text-blue-700 mt-2 text-3xl sm:text-2xl">
+            <p className="text-blue-700 font-[poppins] mt-2 text-3xl sm:text-2xl">
               Elige una opción para continuar.
             </p>
           </header>
 
-          {/* Grid responsivo */}
+          {/* grid responsivo */}
           <section>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {CARDS.map(({ to, title, desc, icon: Icon }) => (

@@ -1,10 +1,18 @@
-export async function uploadFile(file, signal) {
-  const url = "https://localhost:44351/api/Files/upload";
+export async function uploadFile(codigo, file, signal) {
+  if (!codigo) throw new Error("Falta el código de la solicitud");
+  if (!file) throw new Error("Selecciona un archivo");
+
+  const url = `/api/Uploads/${encodeURIComponent(codigo)}`;
+
   const fd = new FormData();
-  fd.append("file", file);
+  fd.append("file", file); // el nombre del campo debe ser 'file'
 
   const res = await fetch(url, { method: "POST", body: fd, signal });
-  if (!res.ok) throw new Error("No se pudo subir el archivo");
+  if (!res.ok) {
+    const msg = await res.text().catch(() => "");
+    throw new Error(msg || `No se pudo subir el archivo (HTTP ${res.status})`);
+  }
+  // Respuesta esperada url: "...", tipo: "image/png"
   return res.json();
 }
 

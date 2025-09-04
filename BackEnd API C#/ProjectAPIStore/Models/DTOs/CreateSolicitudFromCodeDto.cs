@@ -1,5 +1,4 @@
-﻿// Models/Dtos/CreateSolicitudFromCodeDto.cs
-namespace ProjectAPIStore.Models.Dtos
+﻿namespace ProjectAPIStore.Models.Dtos
 {
     public class CreateSolicitudFromCodeDto
     {

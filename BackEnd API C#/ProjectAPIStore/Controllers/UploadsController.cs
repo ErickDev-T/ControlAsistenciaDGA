@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using ProjectAPIStore.Data;   // <-- tu namespace del DbContext
-using ProjectAPIStore.Models; // <-- tu namespace de modelos
+using ProjectAPIStore.Data; 
+using ProjectAPIStore.Models;
 
 [Route("api/[controller]")]
 [ApiController]

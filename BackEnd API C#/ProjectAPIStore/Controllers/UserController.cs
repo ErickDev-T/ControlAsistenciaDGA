@@ -1,13 +1,12 @@
-﻿// Controllers/UsuariosController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ProjectAPIStore.Data;     // DbContext
-using ProjectAPIStore.Models;   // User
+using ProjectAPIStore.Data;    
+using ProjectAPIStore.Models;  
 
 namespace ProjectAPIStore.Controllers;
 
 [ApiController]
-[Route("api/usuarios")] // quedará: GET /api/usuarios/by-code?codigo=103
+[Route("api/usuarios")] // GET /api/usuarios/by-code?codigo=103
 public class UsuariosController : ControllerBase
 {
     private readonly TestDgadbContext _context;
