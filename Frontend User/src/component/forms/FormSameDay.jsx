@@ -1,278 +1,343 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getUsuarioByCode } from "../../services/usuarios";
-import { saveSolicitudFromCode, uploadFile } from "../../services/solicitudesService";
+import { saveSolicitudFromCode } from "../../services/solicitudesService";
 import { uploadFileBySolicitudId } from "../../services/uploads";
 
-export default function FormStandar() {
-  const [codigo, setCodigo] = useState("");
-  const [nombre, setNombre] = useState("");
-  const [entryDate, setEntryDate] = useState("");
-  const [entryTime, setEntryTime] = useState("");
-  const [exitDate, setExitDate] = useState("");
-  const [exitTime, setExitTime] = useState("");
-  const [file, setFile] = useState(null);
+function newRow() {
+  return {
+    _id: crypto.randomUUID(),
+    codigo: "",
+    nombre: "",
+    entryDate: "",
+    entryTime: "",
+    exitDate: "",
+    exitTime: "",
+    file: null,
+    _status: "idle", // idle | fetching | ok | err
+    _errMsg: "",
+  };
+}
 
-  const [loading, setLoading] = useState(false);
+export default function FormStandarExcelLike() {
+  const [rows, setRows] = useState([newRow()]);
   const [submitting, setSubmitting] = useState(false);
-  const [err, setErr] = useState("");
   const [okMsg, setOkMsg] = useState("");
+  const [errMsg, setErrMsg] = useState("");
 
-  useEffect(() => {
-    setExitDate(entryDate || "");
-  }, [entryDate]);
+  const patchRow = (id, patch) =>
+    setRows((rs) => rs.map((r) => (r._id === id ? { ...r, ...patch } : r)));
 
-  const onBuscar = async () => {
-    setErr("");
-    setOkMsg("");
-    const c = (codigo ?? "").toString().trim();
-    if (!c) return setErr("Ingresa un código");
+  const addRow = () => {
+    const last = rows[rows.length - 1];
 
-    const ctrl = new AbortController();
-    try {
-      setLoading(true);
-      const data = await getUsuarioByCode(c, ctrl.signal);
-      setNombre(data?.nombreApellido ?? "");
-      if (!data?.nombreApellido) setErr("Usuario sin nombre registrado");
-    } catch (e) {
-      setNombre("");
-      setErr(e.message || "No se pudo buscar");
-    } finally {
-      setLoading(false);
+    if (
+      !last.codigo?.toString().trim() ||
+      !last.entryDate ||
+      !last.entryTime ||
+      !last.exitDate ||
+      !last.exitTime
+    ) {
+      setErrMsg("Completa la última fila antes de agregar una nueva.");
+
+      setTimeout(() => {
+        setErrMsg("");
+      }, 3000);
+
+      return;
+    }
+
+    setErrMsg("");
+    setRows((rs) => [...rs, newRow()]);
+  };
+
+
+  const removeRow = (id) =>
+    setRows((rs) => (rs.length > 1 ? rs.filter((r) => r._id !== id) : rs));
+
+  const onCellChange = (id, key, value) => {
+    // solo numeros en codigo
+    if (key === "codigo") value = (value ?? "").toString().replace(/\D/g, "");
+
+    // cuando cambie la fecha de entrada igualamos la de salida
+    if (key === "entryDate") {
+      patchRow(id, { entryDate: value, exitDate: value });
+      return;
+    }
+    patchRow(id, { [key]: value });
+  };
+
+  const onCodeKeyDown = (e, id) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleCodeLookup(id);
     }
   };
 
-  const validate = () => {
-    if (!codigo?.toString().trim()) return "Ingresa un código";
-    if (!entryDate) return "Ingresa la fecha de entrada";
-    if (!entryTime) return "Ingresa la hora de entrada";
-    // exitDate ya se iguala a entryDate
-    if (!exitTime) return "Ingresa la hora de salida";
-    return "";
-  };
+  const handleCodeLookup = async (id) => {
+    const row = rows.find((r) => r._id === id);
+    const codigo = (row?.codigo ?? "").toString().trim();
+    if (!codigo) return;
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setErr("");
-    setOkMsg("");
-
-    const msg = validate();
-    if (msg) return setErr(msg);
-
+    patchRow(id, { _status: "fetching", _errMsg: "" });
     const ctrl = new AbortController();
     try {
-      setSubmitting(true);
-
-      // primero crear la solicitud sin documento 
-      const payload = {
-        code: Number(codigo),
-        entryDate,
-        entryTime,
-        exitDate: entryDate,     //  igual a la de entrada
-        exitTime: exitTime || null,
-        documentUrl: null,
-        documentType: null,
-      };
-
-      const sol = await saveSolicitudFromCode(payload, ctrl.signal);
-
-      //obtener el id
-      const solicitudId = sol?.id ?? sol?.data?.id ?? sol?.solicitudId ?? null;
-
-      if (!solicitudId) {
-        throw new Error("No se pudo obtener el ID de la solicitud");
+      const data = await getUsuarioByCode(codigo, ctrl.signal);
+      const nombre = data?.nombreApellido ?? "";
+      if (!nombre) {
+        patchRow(id, { _status: "err", _errMsg: "Usuario sin nombre", nombre: "" });
+      } else {
+        patchRow(id, { _status: "ok", _errMsg: "", nombre });
       }
+    } catch {
+      patchRow(id, { _status: "err", _errMsg: "Empleado no existe", nombre: "" });
+    }
+  };
 
-      // subir archivo si hay usando el ID
-      let uploaded = null;
-      if (file) {
-        uploaded = await uploadFileBySolicitudId(solicitudId, file, ctrl.signal);
-        // uploaded = { url, tipo }
+  const validateAll = () => {
+    for (const r of rows) {
+      if (!r.codigo?.toString().trim()) {
+        showTempError("Falta el código en alguna fila.");
+        return false;
       }
+      if (!r.entryDate) {
+        showTempError("Falta la fecha de entrada en alguna fila.");
+        return false;
+      }
+      if (!r.entryTime) {
+        showTempError("Falta la hora de entrada en alguna fila.");
+        return false;
+      }
+      if (!r.exitDate) {
+        showTempError("Falta la fecha de salida en alguna fila.");
+        return false;
+      }
+      if (!r.exitTime) {
+        showTempError("Falta la hora de salida en alguna fila.");
+        return false;
+      }
+    }
+    setErrMsg("");
+    return true;
+  };
 
-      setOkMsg("Solicitud guardada con éxito");
-      setCodigo("");
-      setNombre("");
-      setEntryDate("");
-      setEntryTime("");
-      setExitDate("");
-      setExitTime("");
-      setFile(null);
-      e.target.reset();
+  // mostrar error por 3s
+  const showTempError = (msg) => {
+    setErrMsg(msg);
+    setTimeout(() => {
+      setErrMsg("");
+    }, 3000);
+  };
+
+
+  const onSubmitAll = async (e) => {
+    e?.preventDefault?.();
+    setOkMsg("");
+    setErrMsg("");
+
+    const ok = validateAll();
+    if (!ok) return;  // si no pasa validacion no sigue
+
+    setSubmitting(true);
+    try {
+      await Promise.all(
+        rows.map(async (r) => {
+          const payload = {
+            code: Number(r.codigo),
+            entryDate: r.entryDate,   // YYYY-MM-DD
+            entryTime: r.entryTime,   // HH:MM
+            exitDate: r.exitDate || null,
+            exitTime: r.exitTime || null,
+            documentUrl: null,
+            documentType: null,
+          };
+
+          const ctrl = new AbortController();
+          const sol = await saveSolicitudFromCode(payload, ctrl.signal);
+          const solicitudId = sol?.id ?? sol?.data?.id ?? sol?.solicitudId ?? null;
+          if (!solicitudId) throw new Error("No se pudo obtener el ID de la solicitud");
+
+          if (r.file) {
+            await uploadFileBySolicitudId(solicitudId, r.file, ctrl.signal);
+          }
+        })
+      );
+
+      setOkMsg(`Se guardaron ${rows.length} registro(s) correctamente.`);
+      setRows([newRow()]);
     } catch (e2) {
-      setErr(e2.message || "No se pudo guardar");
+      const msg = e2?.message || "Ocurrió un error al guardar.";
+      setErrMsg(msg);
+
+      setTimeout(() => {
+        setErrMsg("");
+      }, 3000);
     } finally {
       setSubmitting(false);
     }
   };
 
-
-
   return (
-    <div className="bg-slate-900">
-      <div className="min-h-[calc(50vh)] bg-gradient-to-b from-blue-50 via-white to-blue-50 m-5 rounded-t-lg">
-        <div className="px-4 sm:px-6 lg:px-8 py-10">
-          <div className="max-w-7xl mx-auto">
-            <div className="p-8 max-w-3xl mx-auto bg-white rounded-2xl shadow-lg border border-blue-100">
-              <h2 className="text-2xl font-bold text-blue-800 mb-2 text-center">
-                Formulario de Registro mismo dia
-              </h2>
-              <p className="text-center text-sm text-gray-600 mb-6">
-                Ingresa el código, confirma el nombre y completa fecha/hora. Adjunta un documento si aplica.
-              </p>
+    <div className="min-h-[65vh] bg-white p-8 mr-3 ml-3 rounded-t-lg">
+      <form onSubmit={onSubmitAll} className="w-full">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-lg font-semibold text-slate-700">Registo pasadia</h3>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={addRow}
+              className="px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-50">
+              + Agregar fila
+            </button>
+            <button
+              type="submit"
+              data-testid="submit-btn"
 
-              <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-7">
-                {/* Código + Buscar */}
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Código del empleado <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex items-end gap-3">
+              disabled={submitting}
+              className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-60">
+              {submitting ? "Guardando..." : "Enviar todo"}
+            </button>
+          </div>
+        </div>
+
+        {errMsg && (
+          <div className="mb-3 text-sm font-medium text-red-700 bg-red-50 px-3 py-2 rounded-md border border-red-100">
+            {errMsg}
+          </div>
+        )}
+        {okMsg && (
+          <div className="mb-3 text-sm font-medium text-green-700 bg-green-50 px-3 py-2 rounded-md border border-green-100">
+            {okMsg}
+          </div>
+        )}
+
+        <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+          <table className="w-full border-collapse text-sm">
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-emerald-50 text-slate-700">
+                <th className="w-10 border border-slate-200 font-semibold text-center">#</th>
+                <th className="border border-slate-200 font-semibold">Código</th>
+                <th className="border border-slate-200 font-semibold">Nombre y Apellido</th>
+                <th className="border border-slate-200 font-semibold">Fecha Entrada</th>
+                <th className="border border-slate-200 font-semibold">Hora Entrada</th>
+                <th className="border border-slate-200 font-semibold">Hora Salida</th>
+                <th className="border border-slate-200 font-semibold">Archivo</th>
+                <th className="w-20 border border-slate-200 font-semibold text-center">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {rows.map((r, idx) => (
+                <tr key={r._id} className="odd:bg-white even:bg-slate-50">
+                  <td className="border border-slate-200 text-center align-middle">{idx + 1}</td>
+
+                  {/* Código */}
+                  <td className="border border-slate-200 p-1">
                     <input
                       type="text"
                       inputMode="numeric"
-                      value={codigo}
-                      onChange={(e) => setCodigo(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && onBuscar()}
+                      value={r.codigo}
+                      onChange={(e) => onCellChange(r._id, "codigo", e.target.value)}
+                      onKeyDown={(e) => onCodeKeyDown(e, r._id)}
+                      onBlur={() => handleCodeLookup(r._id)}
                       placeholder="Ej.: 1001"
-                      className="flex-1 rounded-xl border border-blue-200 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-                      aria-describedby="codigo-help"
+                      className="w-full h-9 rounded-md border border-blue-200 px-2 focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
                     />
+                    {r._status === "fetching" && (
+                      <div className="mt-0.5 text-[11px] text-slate-500">Buscando…</div>
+                    )}
+                    {r._status === "err" && (
+                      <div className="mt-0.5 text-[11px] text-red-600">{r._errMsg}</div>
+                    )}
+                  </td>
+
+                  {/* Nombre */}
+                  <td className="border border-slate-200 p-1">
+                    <input
+                      type="text"
+                      value={r.nombre}
+                      disabled
+                      placeholder="—"
+                      className="w-full h-9 rounded-md border border-blue-200 px-2 bg-gray-50 text-gray-600"
+                    />
+                  </td>
+
+                  {/* Fecha entrada */}
+                  <td className="border border-slate-200 p-1">
+                    <input
+                      type="date"
+                      value={r.entryDate}
+                      onChange={(e) => onCellChange(r._id, "entryDate", e.target.value)}
+                      className="w-full h-9 rounded-md border border-blue-200 px-2 focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
+                    />
+                  </td>
+
+                  {/* Hora entrada */}
+                  <td className="border border-slate-200 p-1">
+                    <input
+                      type="time"
+                      value={r.entryTime}
+                      onChange={(e) => onCellChange(r._id, "entryTime", e.target.value)}
+                      className="w-full h-9 rounded-md border border-blue-200 px-2 focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
+                    />
+                  </td>
+
+                  {/* Hora salida */}
+                  <td className="border border-slate-200 p-1">
+                    <input
+                      type="time"
+                      value={r.exitTime}
+                      onChange={(e) => onCellChange(r._id, "exitTime", e.target.value)}
+                      className="w-full h-9 rounded-md border border-blue-200 px-2 focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
+                    />
+                  </td>
+
+                  {/* Archivo */}
+                  <td className="border border-slate-200 p-1">
+                    <input
+                      type="file"
+                      data-testid="file-input"
+                      onChange={(e) => onCellChange(r._id, "file", e.target.files?.[0] ?? null)}
+                      accept="application/pdf,image/*"
+                      className="block w-full text-xs file:mr-2 file:py-1.5 file:px-2 file:rounded-md file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700"
+                    />
+                  </td>
+
+                  {/* Acciones */}
+                  <td className="border border-slate-200 p-1 text-center">
                     <button
                       type="button"
-                      onClick={onBuscar}
-                      disabled={loading}
-                      className="h-[42px] px-5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-60 transition"
-                      aria-label="Buscar por código"
+                      onClick={() => removeRow(r._id)}
+                      className="px-2 py-1 rounded-md border border-slate-200 hover:bg-slate-100"
+                      title="Eliminar fila"
                     >
-                      {loading ? "Buscando..." : "Buscar"}
+                      Eliminar
                     </button>
-                  </div>
-                  <p id="codigo-help" className="mt-1 text-xs text-gray-500">
-                    Escribe el código y presiona <b>Buscar</b> para cargar el nombre.
-                  </p>
-                </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
 
-                {/* Nombre */}
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre y Apellido
-                  </label>
-                  <input
-                    disabled
-                    type="text"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    placeholder="—"
-                    className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm bg-gray-50 text-gray-600"
-                  />
-                </div>
-
-                {/* Sección: Fechas y horas */}
-                <div className="col-span-1 md:col-span-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="h-1 w-8 bg-blue-600 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-blue-800 uppercase tracking-wide">
-                      Fechas y horas
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Fecha de entrada */}
-                <div >
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Fecha de entrada <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={entryDate}
-                    onChange={(e) => setEntryDate(e.target.value)}
-                    className="w-full h-11 rounded-xl border border-blue-200 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Día de inicio de la jornada.</p>
-                </div>
-
-                {/* Hora de entrada */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Hora de entrada <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="time"
-                    step="60"
-                    value={entryTime}
-                    onChange={(e) => setEntryTime(e.target.value)}
-                    className="w-full h-11 rounded-xl border border-blue-200 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Ej.: 08:00</p>
-                </div>
-
-                {/* Hora de salida  */}
-                <div className="col-span-1 md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Hora de salida <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="time"
-                    step="60"
-                    value={exitTime}
-                    onChange={(e) => setExitTime(e.target.value)}
-                    className="w-full h-11 rounded-xl border border-blue-200 px-3 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Ej.: 16:00</p>
-                </div>
-
-
-                {/* Documento */}
-                <div className="col-span-1 md:col-span-2">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="h-1 w-8 bg-blue-600 rounded-full"></div>
-                    <h3 className="text-sm font-semibold text-blue-800 uppercase tracking-wide">
-                      Documento de soporte (opcional)
-                    </h3>
-                  </div>
-
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Adjuntar archivo
-                  </label>
-                  <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                    accept="image/*,application/pdf"
-                    className="w-full rounded-xl border border-blue-200 px-3 py-2 shadow-sm bg-white focus:border-blue-500 focus:ring focus:ring-blue-200 transition"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Formatos permitidos: PDF o imagen.
-                  </p>
-                </div>
-
-                {/* Mensajes */}
-                {err && (
-                  <div className="col-span-1 md:col-span-2 text-sm font-medium text-red-600 bg-red-50 px-3 py-2 rounded-xl border border-red-100">
-                    {err + " error debugg xd"}
-                  </div>
-                )}
-                {okMsg && (
-                  <div className="col-span-1 md:col-span-2 text-sm font-medium text-green-700 bg-green-50 px-3 py-2 rounded-xl border border-green-100">
-                    {okMsg}
-                  </div>
-                )}
-
-                {/* Acciones */}
-                <div className="col-span-1 md:col-span-2 flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="px-6 py-2 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-60 transition"
-                  >
-                    {submitting ? "Guardando..." : "Enviar"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          </table>
         </div>
-      </div>
-    </div>
 
+        {/* Barra inferior */}
+        <div className="mt-3 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={addRow}
+            className="px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-50"
+          >
+            + Agregar fila
+          </button>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-60"
+          >
+            {submitting ? "Guardando..." : "Enviar todo"}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

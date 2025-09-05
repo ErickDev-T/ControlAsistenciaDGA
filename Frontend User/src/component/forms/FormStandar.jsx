@@ -35,12 +35,18 @@ export default function FormStandarExcelLike() {
       !last.exitTime
     ) {
       setErrMsg("Completa la última fila antes de agregar una nueva.");
+
+      setTimeout(() => {
+        setErrMsg("");
+      }, 3000);
+
       return;
     }
 
     setErrMsg("");
     setRows((rs) => [...rs, newRow()]);
   };
+
 
   const removeRow = (id) =>
     setRows((rs) => (rs.length > 1 ? rs.filter((r) => r._id !== id) : rs));
@@ -79,7 +85,7 @@ export default function FormStandarExcelLike() {
 
   const validateAll = () => {
     for (const r of rows) {
-     // if (!r.codigo?.toString().trim()) return "Falta el código en alguna fila.";
+      // if (!r.codigo?.toString().trim()) return "Falta el código en alguna fila.";
       if (!r.entryDate) return "Falta la fecha de entrada en alguna fila.";
       if (!r.entryTime) return "Falta la hora de entrada en alguna fila.";
       if (!r.exitDate) return "Falta la fecha de salida en alguna fila.";
@@ -134,24 +140,22 @@ export default function FormStandarExcelLike() {
   };
 
   return (
-    <div className="min-h-screen bg-white p-8 mr-3 ml-3">
 
+    <div className="min-h-[65vh] bg-white p-8 mr-3 ml-3 rounded-t-lg">
       <form onSubmit={onSubmitAll} className="w-full">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-slate-700">Carga tipo Excel</h3>
+          <h3 className="text-lg font-semibold text-slate-700">Registro diario</h3>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={addRow}
-              className="px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-50"
-            >
+              className="px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-50">
               + Agregar fila
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-60"
-            >
+              className="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-60">
               {submitting ? "Guardando..." : "Enviar todo"}
             </button>
           </div>
@@ -175,9 +179,9 @@ export default function FormStandarExcelLike() {
                 <th className="w-10 border border-slate-200 font-semibold text-center">#</th>
                 <th className="border border-slate-200 font-semibold">Código</th>
                 <th className="border border-slate-200 font-semibold">Nombre y Apellido</th>
-                <th className="border border-slate-200 font-semibold">Fecha Ent</th>
-                <th className="border border-slate-200 font-semibold">Hora Ent</th>
-                <th className="border border-slate-200 font-semibold">Fecha Sal</th>
+                <th className="border border-slate-200 font-semibold">Fecha Entrada</th>
+                <th className="border border-slate-200 font-semibold">Hora Entrada</th>
+                <th className="border border-slate-200 font-semibold">Fecha Salida</th>
                 <th className="border border-slate-200 font-semibold">Hora Sal</th>
                 <th className="border border-slate-200 font-semibold">Archivo</th>
                 <th className="w-20 border border-slate-200 font-semibold text-center">Acciones</th>
@@ -264,6 +268,7 @@ export default function FormStandarExcelLike() {
                   <td className="border border-slate-200 p-1">
                     <input
                       type="file"
+                      data-testid="file-input"
                       onChange={(e) =>
                         onCellChange(r._id, "file", e.target.files?.[0] ?? null)
                       }
@@ -293,12 +298,14 @@ export default function FormStandarExcelLike() {
         <div className="mt-3 flex justify-end gap-2">
           <button
             type="button"
+            data-testid="add-row-btn"
             onClick={addRow}
             className="px-3 py-2 rounded-md border border-slate-200 hover:bg-slate-50"
           >
             + Agregar fila
           </button>
           <button
+          data-testid="submit-btn"
             type="submit"
             disabled={submitting}
             className="px-4 py-2 rounded-md bg-blue-600 text-white font-semibold hover:bg-blue-700 disabled:opacity-60"

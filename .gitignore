@@ -39,3 +39,6 @@ Thumbs.db
 appsettings.json
 appsettings.Development.json
 secrets.json
+
+# ---- Playwright results ----
+
